@@ -1,0 +1,38 @@
+---
+title: "Predicting term deposit subscription"
+author: "Abdulrahman Aleid, Muhaimin Choudhury, David Wu"
+date: "2026/11/18"
+jupyter: python3
+format:
+  html:
+    embed-resources: true
+    toc: true
+  pdf:
+    toc: true
+---
+
+```{python}
+import os
+import pandas as pd
+import requests
+import altair as alt
+from sklearn.model_selection import train_test_split
+
+_ = alt.renderers.enable("png", scale_factor=2)
+```
+
+# Summary
+
+# Introduction
+
+# Methods
+
+## Data
+
+## Analysis
+
+# Results
+
+# Discussion
+
+# References
