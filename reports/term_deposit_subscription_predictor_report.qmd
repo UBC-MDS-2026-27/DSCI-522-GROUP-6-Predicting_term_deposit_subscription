@@ -350,8 +350,144 @@ The DummyClassifier achieved a validation accuracy of 0.883, while the f1 score 
 Therefore, we want to choose the Logestic Regression as the best model to use.
 
 
-# Results
+# Results & Discussion
 
-# Discussion
+```{python}
+target_counts = (
+    bank_train["y"]
+    .value_counts()
+    .rename_axis("subscribed")
+    .reset_index(name= "count")
+)
+
+target_counts["percent"] = (target_counts["count"]/len(bank_train) * 100).round(1)
+target_counts
+```
+
+```{python}
+target_chart = (
+    alt.Chart(target_counts)
+    .mark_bar()
+    .encode(
+        x=alt.X("subscribed:N", title = "Subscribed to term deposit", 
+               axis=alt.Axis(labelAngle =0)),
+        y=alt.Y("count:Q", title = "Number of clients"),
+        color=alt.Color("subscribed:N", legend = None)
+    )
+    .properties(width=250, height=250, title="Class distribution of the target in training data")
+)
+
+target_chart
+```
+
+```{python}
+bank_train[["age", "balance", "campaign", "pdays", "previous"]].describe()
+```
+
+```{python}
+for col in ["job", "marital", "education", "default", "housing", "loan", "contact", "month", "poutcome"]:
+    print(col, "-", bank_train[col].nunique(), "levels")
+    print(bank_train[col].value_counts(normalize=True).round(3), "\n")
+```
+
+```{python}
+def subscription_rate(df, col):
+    return(
+        df.assign(subscribed=(df["y"]=="yes"))
+        .groupby(col)["subscribed"].mean()
+        .reset_index(name="rate")
+    )
+
+bank_train_eda = bank_train.assign(prev_contacted = (bank_train["pdays"]!= -1))
+
+cat_cols = ["poutcome", "contact", "month", "job", "housing", "loan", "default", "education", "marital", "prev_contacted"]
+
+cat_perc = []
+
+for col in cat_cols:
+    r = subscription_rate(bank_train_eda, col).rename(columns = {col:"category"})
+    r ["feature"] = col
+    cat_perc.append(r)
+
+rates_cat = pd.concat(cat_perc, ignore_index=True)
+
+cat_chart = (
+    alt.Chart(rates_cat)
+    .mark_bar()
+    .encode(
+        x=alt.X("rate:Q", title = "Subscription rate", axis=alt.Axis(format="%")),
+        y=alt.Y("category:N", sort = "-x", title = None)
+        )
+    .properties(width=150)
+    .facet(facet="feature:N", columns=3)
+    .resolve_scale(y="independent")
+    .properties(title = "Categorical features with Subscription rate")
+    )
+
+cat_chart
+```
+
+```{python}
+baseline = (bank_train["y"] == "yes").mean()
+
+poutcome_rate = subscription_rate(bank_train, "poutcome")
+
+order = poutcome_rate.sort_values("rate", ascending=False)["poutcome"].tolist()
+
+poutcome_chart = (
+    alt.Chart(poutcome_rate)
+    .mark_bar()
+    .encode(
+        x=alt.X("rate:Q", title = "Subscription rate", axis=alt.Axis(format="%")),
+        y=alt.Y("poutcome:N", sort = order, title = "Previous campaign outcome"), 
+    )
+    .properties(width=400, height=400, title = "Subscription rate based on previous campaign outcome")
+    
+)
+
+baseline_rule = alt.Chart(alt.Data(values=[{"b":baseline}])).mark_rule(strokeDash =[4,4]).encode(x="b:Q")
+
+labels =(alt.Chart(poutcome_rate)
+         .mark_text(align = "left", dx=4, color="black")
+         .encode(
+             x=alt.X("rate:Q"),
+             y=alt.Y("poutcome:N", sort= order),
+             text=alt.Text("rate:Q", format =".0%")
+         )
+)
+poutcome_chart + baseline_rule +labels
+```
+
+```{python}
+
+num_cols = ["age", "balance", "campaign", "previous"]
+
+num_df = bank_train.melt(
+    id_vars="y", value_vars=num_cols,
+    var_name="feature", value_name = "value"
+)
+
+alt.data_transformers.enable("vegafusion")
+
+num_chart = (
+    alt.Chart(num_df)
+    .mark_boxplot()
+    .encode(
+        x=alt.X("y:N", title="Subscribed", axis=alt.Axis(labelAngle =0)),
+        y=alt.Y("value:Q", title=None),
+        color=alt.Color("y:N", legend=None)
+    )
+    .properties(width=150, height=200)
+    .facet(facet="feature:N", columns = 4)
+    .resolve_scale(y="independent")
+    .properties(title = "Numeric features with subscription outcome")
+)
+
+
+num_chart
+```
+
+
+
 
 # References
