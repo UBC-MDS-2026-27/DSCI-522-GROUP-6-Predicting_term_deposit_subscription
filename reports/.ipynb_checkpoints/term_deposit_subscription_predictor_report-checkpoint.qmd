@@ -1,0 +1,150 @@
+---
+title: "Predicting term deposit subscription"
+author: "Abdulrahman Aleid, Muhaimin Choudhury, David Wu"
+date: "2026/11/18"
+jupyter: python3
+format:
+  html:
+    embed-resources: true
+    toc: true
+  pdf:
+    toc: true
+---
+
+```{python}
+import os
+import zipfile
+import requests
+import pandas as pd
+import altair as alt
+from sklearn.model_selection import train_test_split
+
+_ = alt.renderers.enable("png", scale_factor=2)
+```
+
+# Summary
+
+# Introduction
+
+# Methods
+
+## Data
+
+```{python}
+# create the data folders if they don't exist
+os.makedirs("../data/raw", exist_ok=True)
+os.makedirs("../data/processed", exist_ok=True)
+
+# download the zip file from the UCI Machine Learning Repository
+url = "https://archive.ics.uci.edu/static/public/222/bank+marketing.zip"
+zip_path = "../data/raw/bank+marketing.zip"
+
+response = requests.get(url)
+response.raise_for_status()  # stop with an error if the download failed
+with open(zip_path, "wb") as f:
+    f.write(response.content)
+
+with zipfile.ZipFile(zip_path) as z:
+    z.extractall("../data/raw")
+
+with zipfile.ZipFile("../data/raw/bank.zip") as z:
+    z.extractall("../data/raw")
+```
+
+```{python}
+# read in the full data set
+bank = pd.read_csv("../data/raw/bank-full.csv", sep=";")
+```
+
+Before cleaning the data, we checked that the download was complete and that the file has no empty cells or duplicate rows (Table 1). These checks only confirm that the file was read correctly, so they do not use any information that could influence our modelling decisions.
+
+Table 1. Basic checks of the full data set.
+
+```{python}
+pd.DataFrame({
+    "Check": ["Number of rows", "Number of columns", "Empty cells", "Duplicate rows"],
+    "Result": [
+        bank.shape[0],
+        bank.shape[1],
+        bank.isna().sum().sum(),
+        bank.duplicated().sum()
+    ]
+}).set_index("Check")
+```
+
+We removed the call duration variable before modelling. The duration of a call is only known after the call has ended, and by then the outcome (whether the client subscribed) is also known. A model that uses call duration therefore cannot help the bank decide which clients to call, which is the purpose of our analysis. This decision is based on the meaning of the variable, not on the data, so it is safe to make before splitting the data.
+
+```{python}
+# drop duration: it is only known after the call ends,
+# so it cannot be used to predict before calling a client
+bank_clean = bank.drop(columns=["duration"])
+bank_clean.to_csv("../data/processed/bank_clean.csv", index=False)
+```
+
+We then split the data into a training set (80%) and a test set (20%). We split the data before any further exploration, so that the test set does not influence any decision we make. Because only a small share of clients subscribed to a term deposit, we used a stratified split, which keeps the same proportion of subscribers in both sets.
+
+```{python}
+# split the data into training (80%) and test (20%) sets
+bank_train, bank_test = train_test_split(
+    bank_clean,
+    test_size=0.2,
+    stratify=bank_clean["y"],
+    random_state=522
+)
+
+bank_train.to_csv("../data/processed/bank_train.csv", index=False)
+bank_test.to_csv("../data/processed/bank_test.csv", index=False)
+```
+
+## Data quality in the training set
+
+Although the data set has no empty cells, some categorical variables record missing information as the value "unknown" (Table 2). This affects four variables in the training set: job, education, contact type and the outcome of the previous campaign.
+
+Table 2. Number and percentage of "unknown" values in the training set, for the variables that contain them.
+
+```{python}
+# count "unknown" values in each column of the training set
+unknown_counts = (bank_train == "unknown").sum()
+unknown_counts = unknown_counts[unknown_counts > 0]
+
+unknown_table = pd.DataFrame({
+    "Number of unknown values": unknown_counts,
+    "Percent of training rows": (unknown_counts / len(bank_train) * 100).round(1)
+}).rename(index={
+    "job": "Job",
+    "education": "Education",
+    "contact": "Contact type",
+    "poutcome": "Previous campaign outcome"
+})
+unknown_table.index.name = "Variable"
+unknown_table
+```
+
+To understand the "unknown" values in the previous campaign outcome, we compared this variable with the number of days since the client was last contacted in a previous campaign. The data set uses -1 for clients who were not previously contacted (Table 3).
+
+Table 3. Number of clients in the training set with an unknown previous campaign outcome, and how many of them were not previously contacted.
+
+```{python}
+# keep only the clients whose previous campaign outcome is "unknown"
+unknown_poutcome = bank_train[bank_train["poutcome"] == "unknown"]
+
+# count how many of them were not previously contacted (pdays == -1)
+n_unknown = len(unknown_poutcome)
+n_not_contacted = (unknown_poutcome["pdays"] == -1).sum()
+
+pd.DataFrame({
+    "Clients with unknown previous outcome": [n_unknown],
+    "Of these, not previously contacted": [n_not_contacted],
+    "Percent not previously contacted": [round(n_not_contacted / n_unknown * 100, 2)]
+}, index=["Training set"])
+```
+
+Almost all clients with an unknown previous campaign outcome (29,563 of 29,567, or 99.99%) were not contacted in a previous campaign (Table 3). For this variable, "unknown" therefore does not represent missing information: it means that there was no previous campaign for that client. For the other three variables, the "unknown" values are true missing information, but we kept them as well. Removing these rows would discard a large part of the data, because almost a third of the clients in the training set have an unknown contact type (Table 2). We therefore kept "unknown" as its own category in all four variables, so that the model can learn from it like any other category.
+
+## Analysis
+
+# Results
+
+# Discussion
+
+# References
