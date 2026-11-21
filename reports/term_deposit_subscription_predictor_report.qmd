@@ -205,6 +205,11 @@ X_train_processed = full_preprocessor.fit_transform(X_train)
 X_test_processed = full_preprocessor.transform(X_test)
 ```
 
+For model training, we decide to take the Dummy Classifier as the baseline. And then we are going to set Logistic Regression and KNearestNeighbour as 2 candidates. All of the three models are trained with the same condition, which is 5-fold cross-validation. 
+
+As the DummyClassifier Model Result (Tabel .) shown below, the DummyClassifier achieved a validation accuracy of 0.883, while the f1 score is 0, which indicates that this model failed to identify customers who subscribed to a term deposit. This is might because of the class imbalance in the dataset.
+
+Tabel. DummyClassifier Model Result
 ```{python}
 dummy_pipe = make_pipeline(
     full_preprocessor,
@@ -248,8 +253,13 @@ dummy_results = pd.DataFrame({
         dummy_scores["test_f1"].mean()
     ]
 })
+
+display(dummy_results.round(3))
 ```
 
+As the Logistic Regression Model Result (Tabel ) shown below, we can see that Logistic Regression gets validation accuracy as 0.894, precision as 0.676, recall as 0.174, and F1 score as 0.277. We can see all of the data is higher than DummyClassifier model. This indicates that this model is a better choice compared with DummyClassifier model.
+
+Table. Logistic Regression Model Result
 ```{python}
 reg_pipe = make_pipeline(
     full_preprocessor,
@@ -280,8 +290,13 @@ reg_results = pd.DataFrame({
         reg_scores["test_f1"].mean()
     ]
 })
+
+display(reg_results.round(3))
 ```
 
+As the KNearestNeighbour (KNN) Model Result (Tabel .) shown below, we can see that KNN model gets accuracy as 0.884, precision as 0.506, recall as 0.192, F1 score as 0.278. All of the present data is also better than DummyClassifier model. This indicates that this model is better than DummyClassifier model.
+
+Tabel. KNearestNeighbour (KNN) Model Result
 ```{python}
 knn_pipe = make_pipeline(
     full_preprocessor,
@@ -312,44 +327,26 @@ knn_results = pd.DataFrame({
         knn_scores["test_f1"].mean()
     ]
 })
+
+display(knn_results.round(3))
 ```
 
+
+As the Conclusion of data from three models (Tabel .) shown below, in comparison of Logestic Regression and KNearestNeighbour, we can find that the gap of f1 score of train and validation of Logestic Regression, which is about 0.01, is much smaller than the one of K-Nearest Neighbour model, which is about 0.12. This indicates that KNN model is might a bit overfitting.
+
+Tabel.  Conclusion of data from three models
 ```{python}
-knn_pipe = make_pipeline(
-    full_preprocessor,
-    KNeighborsClassifier(n_neighbors=5)
-)
+comparison_df = pd.concat([
+    dummy_results.assign(Model="Dummy"),
+    reg_results.assign(Model="Logistic Regression"),
+    knn_results.assign(Model="KNN")
+], ignore_index=True)
 
-knn_scores = cross_validate(
-    knn_pipe,
-    X_train,
-    y_train,
-    cv=cv,
-    scoring=scoring,
-    return_train_score=True
-)
-
-knn_results = pd.DataFrame({
-    "Metric": ["Accuracy", "Precision", "Recall", "F1"],
-    "Train": [
-        knn_scores["train_accuracy"].mean(),
-        knn_scores["train_precision"].mean(),
-        knn_scores["train_recall"].mean(),
-        knn_scores["train_f1"].mean()
-    ],
-    "Validation": [
-        knn_scores["test_accuracy"].mean(),
-        knn_scores["test_precision"].mean(),
-        knn_scores["test_recall"].mean(),
-        knn_scores["test_f1"].mean()
-    ]
-})
+display(comparison_df)
 ```
-We decide to take the Dummy Classifier as the baseline. And then we are going to set Logistic Regression and KNearestNeighbour as 2 candidates. All of the three models are trained with the same condition, which is 5-fold cross-validation. 
+ 
 
-The DummyClassifier achieved a validation accuracy of 0.883, while the f1 score is 0, which indicates that this model failed to identify customers who subscribed to a term deposit. This is might because of the class imbalance in the dataset. Logistic Regression achieved the highest validation accuracy as 0.894, with the precision as 0.676, with an F1 score of 0.277. KNN achieved a slightly higher F1 score as 0.278, with the recall as 0.192, but its precision was lower as 0.506. In comparison of Logestic Regression and KNearestNeighbour, we can find that the gap of f1 score of train and validation of Logestic Regression, which is about 0.01, is much smaller than the one of K-Nearest Neighbour model, which is about 0.12.
-
-Therefore, we want to choose the Logestic Regression as the best model to use.
+Therefore, we want to choose the Logestic Regression as the best model to use, because it provides comparable validation F1 performance and higher precision
 
 
 # Results & Discussion
@@ -616,3 +613,4 @@ num_chart
 
 
 # References
+Moro, S., P. Rita, and P. Cortez. 2014. “Bank Marketing.” Dataset. UCI Machine Learning Repository. https://doi.org/10.24432/C5K306.
