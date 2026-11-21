@@ -1,14 +1,16 @@
 ---
 title: "Predicting term deposit subscription"
-author: "Abdulrahman Aleid, Muhaimin Choudhury, David Wu"
+author: "Abdulrahman Aleid, Ahmed Muhaimin Choudhury, David Wu"
 date: "2026/11/18"
 jupyter: python3
 format:
   html:
     embed-resources: true
     toc: true
+    code-overflow: wrap
   pdf:
     toc: true
+    code-overflow: wrap
 ---
 
 ```{python}
@@ -347,9 +349,268 @@ display(comparison_df)
 Therefore, we want to choose the Logestic Regression as the best model to use, because it provides comparable validation F1 performance and higher precision
 
 
-# Results
+# Results & Discussion
+## Target class composition
+To evaluate the predictors and select a testing approach, we need to find the class composition in the target 
+and see if the classes are balanced or not. (Figure 1) And the target class composition table tells us that there is massive 
+class imbalance in the data 88.3% of the target being no. So, conventional accuracy score would not be a good scoring metric. 
+Therefore, we also need to use F1, precision and recall as scoring metrics.
 
-# Discussion
+
+**Table 4.** Target class composition in the training data
+
+```{python}
+target_counts = (
+    bank_train["y"]
+    .value_counts()
+    .rename_axis("subscribed")
+    .reset_index(name= "count")
+)
+
+target_counts["percent"] = (target_counts["count"]/len(bank_train) * 100).round(1)
+target_counts
+```
+
+```{python}
+target_chart = (
+    alt.Chart(target_counts)
+    .mark_bar()
+    .encode(
+        x=alt.X("subscribed:N", title = "Subscribed to term deposit", 
+               axis=alt.Axis(labelAngle =0)),
+        y=alt.Y("count:Q", title = "Number of clients"),
+        color=alt.Color("subscribed:N", legend = None)
+    )
+    .properties(width=150, height=250, title="Class distribution of the target in training data")
+)
+
+target_chart
+```
+**Figure 1.** Class imbalance of the target in training data for term deposit subscription 
+
+## Descriptive summary of individual features
+Our first glance at the individual features starts with a descriptive summary of individual features divided into numeric and categorical feature summary. From the numeric feature summary table, we can see that there is 
+heavy right skewness in the data and the scales of each feature vary wildly. The range of age and campaign are both within 0-100 (18 to 95 and 1 to 63 respectively) whereas the range for balance and previous ranges from -8019 to 102,127 and from 0 to 275 respectively,
+which indicates that we have to include a scaler in the pipeline for numeric features. Moreover, there's another numeric feature  pdays which ranges from -1 to 871 but in reality, it only carries one useful signal which is whether the client was contacted before or not. 
+So, for that reason we will be converting pdays to a binary feature prev_contacted down the line for the charts, training and fitting. 
+
+**Table 5.** Summary of numeric features
+
+```{python}
+bank_train[["age", "balance", "campaign", "pdays", "previous"]].describe()
+```
+Now, for the summary of categorical features we check the levels of each category and their proportions in their respective category. 
+
+**Table 6.** Summary of categorical features
+
+```{python}
+cat_cols = ["job", "marital", "education", "default", "housing",
+            "loan", "contact", "month", "poutcome"]
+
+cat_summary = pd.DataFrame({
+    "Feature": cat_cols,
+    "Levels": [bank_train[col].nunique() for col in cat_cols],
+    "Most common level": [bank_train[col].value_counts().index[0] for col in cat_cols],
+    "Most common %": [round(bank_train[col].value_counts(normalize=True).iloc[0] * 100, 1)
+                      for col in cat_cols],
+    "Has 'unknown'": ["unknown" in bank_train[col].unique() for col in cat_cols],
+}).set_index("Feature")
+
+cat_summary
+```
+## Analysis of binary features
+To look at whether the categorical and binary features are useful to predict term deposit subscription, we plot the features as bar charts. The pattern we want to find is whether subscription differed for different levels of the same category and if it differed, then by how much. 
+For that, we calculate the subscription rate in each category for its respective levels and compare those rates in the bar chart. We divide it into 3 faceted bar charts; one for binary features, one for categorical features with 3/4 categories and the other for categorical features
+with more than 4 categories. From Figure 2, we can see prev_contacted has a stronger signal than the others, with around 15 percentage points more subscription rate if the client was contacted before compared to a first contact. Housing also has a good signal with a difference of around
+10 percentage points more subscription rate among clients that don't have a housing loan compared to the clients who do. 
+
+```{python}
+def subscription_rate(df, col):
+    return(
+        df.assign(subscribed=(df["y"]=="yes"))
+        .groupby(col)["subscribed"].mean()
+        .reset_index(name="rate")
+    )
+
+bank_train_eda = bank_train.assign(prev_contacted = (bank_train["pdays"]!= -1))
+
+bi_cols = ["housing", "loan", "default", "prev_contacted"]
+
+bi_perc = []
+
+for col in bi_cols:
+    r = subscription_rate(bank_train_eda, col).rename(columns = {col:"category"})
+    r ["feature"] = col
+    bi_perc.append(r)
+
+rates_bi = pd.concat(bi_perc, ignore_index=True)
+
+bi_chart = (
+    alt.Chart(rates_bi)
+    .mark_bar()
+    .encode(
+        x=alt.X("rate:Q", title = "Subscription rate", axis=alt.Axis(format="%")),
+        y=alt.Y("category:N", sort = "-x", title = None)
+        )
+    .properties(width=130, height=100)
+    .facet(facet="feature:N", columns=2)
+    .resolve_scale(y="independent")
+    .properties(title = alt.TitleParams(
+        text="Binary features with Subscription rate",
+        anchor="middle"))
+    )
+
+bi_chart
+```
+**Figure 2.** Comparison of term deposit subscription rate between binary features of training data
+
+
+## Analysis of categorical features
+Next, let's look at categorical features with 3/4 levels. Among those 4 categories, it is evident from Figure 3 that for marital, contact, and education, the subscription rate doesn't vary that much across levels. But for previous campaign outcome (poutcome), the subscription rate for clients 
+who were also a success in the previous campaign is much higher compared to other levels. For categories with more than 4 levels (Figure 4), month also has higher subscription rate in the months of March, September, October and December. For jobs, an interesting finding is students who conventionally 
+don't have a fixed income have the highest subscription rate among all the jobs. But the levels in job category don't vary by a large magnitude like poutcome, so signal from this category would be relatively weaker. 
+
+
+```{python}
+cat_cols34 = ["contact", "education", "marital", "poutcome"]
+
+cat_perc34 = []
+
+for col in cat_cols34:
+    r = subscription_rate(bank_train_eda, col).rename(columns = {col:"category"})
+    r ["feature"] = col
+    cat_perc34.append(r)
+
+rates_cat34 = pd.concat(cat_perc34, ignore_index=True)
+
+cat34_chart = (
+    alt.Chart(rates_cat34)
+    .mark_bar()
+    .encode(
+        x=alt.X("rate:Q", title = "Subscription rate", axis=alt.Axis(format="%")),
+        y=alt.Y("category:N", sort = "-x", title = None)
+        )
+    .properties(width=100, height=100)
+    .facet(facet="feature:N", columns=2)
+    .resolve_scale(y="independent")
+    .properties(title = alt.TitleParams(
+        text=["Categorical features(3/4 categories)", "With Subscription rate"],
+        anchor="middle"))
+    )
+
+
+cat34_chart
+```
+**Figure 3.** Comparison of term deposit subscription rate between categorical features training data with 3/4 levels 
+
+
+```{python}
+cat_cols_more = ["month", "job"]
+
+cat_perc_more = []
+
+for col in cat_cols_more:
+    r = subscription_rate(bank_train_eda, col).rename(columns = {col:"category"})
+    r ["feature"] = col
+    cat_perc_more.append(r)
+
+rates_cat_more = pd.concat(cat_perc_more, ignore_index=True)
+
+cat_more_chart = (
+    alt.Chart(rates_cat_more)
+    .mark_bar()
+    .encode(
+        x=alt.X("rate:Q", title = "Subscription rate", axis=alt.Axis(format="%")),
+        y=alt.Y("category:N", sort = "-x", title = None)
+        )
+    .properties(width=100, height=120)
+    .facet(facet="feature:N", columns=2)
+    .resolve_scale(y="independent")
+    .properties(title = alt.TitleParams(
+        text=["Categorical features( >4 categories)", "With Subscription rate"],
+        anchor="middle"))
+    )
+
+
+cat_more_chart
+```
+**Figure 4.** Comparison of term deposit subscription rate between categorical features of training data with more than 4 levels 
+
+Let's compare the one category that stands out to the baseline average subscription rate in Figure 5. From this bar chart, we can see that the subscription rate for 
+success in poutcome is really high (49 percentage points more than next highest level) compared to the baseline and all the other levels. This indicates that poutcome is a good indicator for the target. 
+
+```{python}
+baseline = (bank_train["y"] == "yes").mean()
+
+poutcome_rate = subscription_rate(bank_train, "poutcome")
+
+order = poutcome_rate.sort_values("rate", ascending=False)["poutcome"].tolist()
+
+poutcome_chart = (
+    alt.Chart(poutcome_rate)
+    .mark_bar()
+    .encode(
+        x=alt.X("rate:Q", title = "Subscription rate", axis=alt.Axis(format="%")),
+        y=alt.Y("poutcome:N", sort = order, title = "Previous campaign outcome"), 
+    )
+    .properties(width=200, height=200, title = alt.TitleParams(
+        text=["Subscription rate based on", "Previous campaign outcome"],
+        anchor="middle"))
+    
+)
+
+baseline_rule = alt.Chart(alt.Data(values=[{"b":baseline}])).mark_rule(strokeDash =[4,4]).encode(x="b:Q")
+
+labels =(alt.Chart(poutcome_rate)
+         .mark_text(align = "left", dx=4, color="black")
+         .encode(
+             x=alt.X("rate:Q"),
+             y=alt.Y("poutcome:N", sort= order),
+             text=alt.Text("rate:Q", format =".0%")
+         )
+)
+poutcome_chart + baseline_rule +labels
+```
+**Figure 5.** Comparison between different levels of previous campaign outcome and the baseline average subscription rate 
+
+## Analysis of numeric features
+Before analyzing the numeric features, we want to note that from the descriptive summary, it looks like two of the numeric features are right skewed where mean is way above the median (balance and campaign) so, we are plotting the numeric features as boxplots
+to understand the skewness of the data and to see if the numeric data (namely the median and IQR) behave differently for people who subscribe compared to people who didn't. So, from Figure 6 below, we can see that medians across all 4 numeric features are 
+nearly the same for both subscribers and non subscribers. The IQRs for all 4 features also have a lot of overlap which means that the numeric features are weaker signals compared to the categorical features. Two features worth mentioning are campaign and balance. 
+From campaign feature (the number of contacts during this campaign), we can see that the subscribers tend to have fewer contacts compared to non subscribers. That means making more contacts with a potential client doesn't necessarily convert them. The ones that subscribe, 
+tend to do so without needing a lot of followups or contacts. Moreover, the balance features show that subscribers tend to have higher balances, and negative balances are rare among them. 
+
+```{python}
+
+num_cols = ["age", "balance", "campaign", "previous"]
+
+num_df = bank_train.melt(
+    id_vars="y", value_vars=num_cols,
+    var_name="feature", value_name = "value"
+)
+
+alt.data_transformers.enable("vegafusion")
+
+num_chart = (
+    alt.Chart(num_df)
+    .mark_boxplot()
+    .encode(
+        x=alt.X("y:N", title="Subscribed", axis=alt.Axis(labelAngle =0)),
+        y=alt.Y("value:Q", title=None),
+        color=alt.Color("y:N", legend=None)
+    )
+    .properties(width=120, height=100)
+    .facet(facet="feature:N", columns = 2)
+    .resolve_scale(y="independent")
+    .properties(title = "Numeric features with subscription outcome")
+)
+
+
+num_chart
+```
+**Figure 6.** Distributions of numeric features of training data by subscription outcome 
+
+
 
 # References
 Harris, Charles R., K. Jarrod Millman, Stéfan J. van der Walt, et al. 2020. “Array Programming with NumPy.” Nature 585: 357–362. https://doi.org/10.1038/s41586-020-2649-2.
