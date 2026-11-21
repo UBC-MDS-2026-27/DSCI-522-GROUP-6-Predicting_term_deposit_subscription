@@ -36,6 +36,10 @@ _ = alt.renderers.enable("png", scale_factor=2)
 
 # Introduction
 
+A term deposit is a bank account where a client keeps money for a fixed period of time and earns a fixed interest rate, but usually cannot withdraw the money early without paying a penalty. Term deposits are useful for banks because they give the bank a stable source of money that it can use, for example, to give loans. To sell term deposits, banks often run direct marketing campaigns, in which staff call clients and offer them the product. However, most clients who are contacted do not subscribe, so calling everyone costs the bank a lot of time and money, and may also annoy clients. A model that can predict which clients are likely to subscribe could help the bank decide which clients to prioritize.
+
+In this project, we asked whether we can predict if a bank client will subscribe to a term deposit, using only information the bank has before calling the client. We used the Bank Marketing data set from the UCI Machine Learning Repository, which contains data from phone marketing campaigns of a Portuguese bank (Moro, Rita, and Cortez 2014). Each row in the data set represents one client who was contacted during a campaign, and includes information about the client, such as their age and type of job, and about the contact, such as the month of the call. The target is whether the client subscribed to a term deposit (yes or no).
+
 # Methods
 
 ## Data
