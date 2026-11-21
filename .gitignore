@@ -1,5 +1,8 @@
-__pycache__/
-*.py[oc]
 .venv/
-.DS_store
-.ipynb_checkpoints/
+.Rhistory
+.RData
+/.quarto/
+**/*.quarto_ipynb
+**.ipynb_checkpoints
+**__pycache__
+.DS_Store
