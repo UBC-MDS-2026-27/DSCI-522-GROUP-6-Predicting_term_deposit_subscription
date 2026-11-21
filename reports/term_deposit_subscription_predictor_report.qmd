@@ -68,7 +68,7 @@ bank = pd.read_csv("../data/raw/bank-full.csv", sep=";")
 
 Before cleaning the data, we checked that the download was complete and that the file has no empty cells or duplicate rows (Table 1). These checks only confirm that the file was read correctly, so they do not use any information that could influence our modelling decisions.
 
-Table 1. Basic checks of the full data set.
+**Table 1.** Basic checks of the full data set.
 
 ```{python}
 pd.DataFrame({
@@ -110,7 +110,7 @@ bank_test.to_csv("../data/processed/bank_test.csv", index=False)
 
 Although the data set has no empty cells, some categorical variables record missing information as the value "unknown" (Table 2). This affects four variables in the training set: job, education, contact type and the outcome of the previous campaign.
 
-Table 2. Number and percentage of "unknown" values in the training set, for the variables that contain them.
+**Table 2.** Number and percentage of "unknown" values in the training set, for the variables that contain them.
 
 ```{python}
 # count "unknown" values in each column of the training set
@@ -132,7 +132,7 @@ unknown_table
 
 To understand the "unknown" values in the previous campaign outcome, we compared this variable with the number of days since the client was last contacted in a previous campaign. The data set uses -1 for clients who were not previously contacted (Table 3).
 
-Table 3. Number of clients in the training set with an unknown previous campaign outcome, and how many of them were not previously contacted.
+**Table 3.** Number of clients in the training set with an unknown previous campaign outcome, and how many of them were not previously contacted.
 
 ```{python}
 # keep only the clients whose previous campaign outcome is "unknown"
@@ -170,7 +170,17 @@ target_counts = (
 )
 
 target_counts["percent"] = (target_counts["count"]/len(bank_train) * 100).round(1)
-target_counts
+
+target_table = (
+    target_counts
+    .set_index("subscribed")
+    .rename(
+        index={"no": "Did not subscribe", "yes": "Subscribed"},
+        columns={"count": "Number of clients", "percent": "Percent of training rows"}
+    )
+)
+target_table.index.name = "Outcome"
+target_table
 ```
 
 ```{python}
@@ -194,12 +204,31 @@ target_chart
 Our first glance at the individual features starts with a descriptive summary of individual features divided into numeric and categorical feature summary. From the numeric feature summary table, we can see that there is 
 heavy right skewness in the data and the scales of each feature vary wildly. The range of age and campaign are both within 0-100 (18 to 95 and 1 to 63 respectively) whereas the range for balance and previous ranges from -8019 to 102,127 and from 0 to 275 respectively,
 which indicates that we have to include a scaler in the pipeline for numeric features. Moreover, there's another numeric feature  pdays which ranges from -1 to 871 but in reality, it only carries one useful signal which is whether the client was contacted before or not. 
-So, for that reason we will be converting pdays to a binary feature prev_contacted down the line for the charts, training and fitting. 
+So, for that reason we will be converting pdays to a binary feature previously_contacted down the line for the charts, training and fitting. 
 
 **Table 5.** Summary of numeric features
 
 ```{python}
-bank_train[["age", "balance", "campaign", "pdays", "previous"]].describe()
+summary_cols = ["age", "balance", "campaign", "pdays", "previous"]
+
+num_summary = (
+    bank_train[summary_cols]
+    .describe()
+    .T[["mean", "50%", "min", "max"]]
+    .round(1)
+    .rename(
+        index={
+            "age": "Age (years)",
+            "balance": "Balance (euros)",
+            "campaign": "Campaign contacts",
+            "pdays": "Days since previous contact",
+            "previous": "Contacts before this campaign"
+        },
+        columns={"mean": "Mean", "50%": "Median", "min": "Minimum", "max": "Maximum"}
+    )
+)
+num_summary.index.name = "Feature"
+num_summary
 ```
 Now, for the summary of categorical features we check the levels of each category and their proportions in their respective category. 
 
@@ -216,14 +245,24 @@ cat_summary = pd.DataFrame({
     "Most common %": [round(bank_train[col].value_counts(normalize=True).iloc[0] * 100, 1)
                       for col in cat_cols],
     "Has 'unknown'": ["unknown" in bank_train[col].unique() for col in cat_cols],
-}).set_index("Feature")
-
+}).set_index("Feature").rename(index={
+    "job": "Job",
+    "marital": "Marital status",
+    "education": "Education",
+    "default": "Has credit in default",
+    "housing": "Has housing loan",
+    "loan": "Has personal loan",
+    "contact": "Contact type",
+    "month": "Last contact month",
+    "poutcome": "Previous campaign outcome"
+})
+cat_summary["Has 'unknown'"] = cat_summary["Has 'unknown'"].map({True: "Yes", False: "No"})
 cat_summary
 ```
 ### Binary features
 To look at whether the categorical and binary features are useful to predict term deposit subscription, we plot the features as bar charts. The pattern we want to find is whether subscription differed for different levels of the same category and if it differed, then by how much. 
 For that, we calculate the subscription rate in each category for its respective levels and compare those rates in the bar chart. We divide it into 3 faceted bar charts; one for binary features, one for categorical features with 3/4 categories and the other for categorical features
-with more than 4 categories. From Figure 2, we can see prev_contacted has a stronger signal than the others, with around 15 percentage points more subscription rate if the client was contacted before compared to a first contact. Housing also has a good signal with a difference of around
+with more than 4 categories. From Figure 2, we can see previously_contacted has a stronger signal than the others, with around 15 percentage points more subscription rate if the client was contacted before compared to a first contact. Housing also has a good signal with a difference of around
 10 percentage points more subscription rate among clients that don't have a housing loan compared to the clients who do. 
 
 ```{python}
@@ -234,9 +273,9 @@ def subscription_rate(df, col):
         .reset_index(name="rate")
     )
 
-bank_train_eda = bank_train.assign(prev_contacted = (bank_train["pdays"]!= -1))
+bank_train_eda = bank_train.assign(previously_contacted = (bank_train["pdays"]!= -1))
 
-bi_cols = ["housing", "loan", "default", "prev_contacted"]
+bi_cols = ["housing", "loan", "default", "previously_contacted"]
 
 bi_perc = []
 
