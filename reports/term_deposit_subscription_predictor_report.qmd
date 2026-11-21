@@ -18,11 +18,9 @@ import os
 import zipfile
 import requests
 import pandas as pd
-import numpy as np
 import altair as alt
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, OneHotEncoder, OrdinalEncoder, FunctionTransformer
-from sklearn.impute import SimpleImputer
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import make_pipeline
 from sklearn.dummy import DummyClassifier
@@ -156,9 +154,11 @@ Almost all clients with an unknown previous campaign outcome (29,563 of 29,567, 
 ## Analysis
 The Python programming language (Van Rossum and Drake 2009) and the following Python packages were used to perform the analysis: requests (Reitz 2011), zipfile (Van Rossum and Drake 2009), NumPy (Harris et al. 2020), pandas (McKinney 2010), Altair (VanderPlas et al. 2018) and scikit-learn (Pedregosa et al. 2011). The code used to perform the analysis and create this report can be found here: <https://github.com/UBC-MDS-2026-27/DSCI-522-GROUP-6-Predicting_term_deposit_subscription>.
 
-Firstly, we are going to analyze the features manually with the meaning. The meaning of duration is last contact duration, in seconds (numeric). And the meaning of month is last contact month of year. Therefore, we don't think these two features would have reasonable relationship with the term deposit description. 
+First, we examined the features based on their definitions and relevance to predicting term deposit subscriptions. The duration feature represents the duration of the last contact with a client, measured in seconds. Since this information is only available after a call has taken place, including it would introduce data leakage when predicting whether a client will subscribe before making the call. Therefore, we excluded duration from the analysis. 
 
-Secondly, we will divide the features into different categories. The three main categories are numeric, categorical, and binary. Here are two points need to be mentioned. The first is that binary features are shown in different ways. Features whose values consists of only 0 and 1 are binray, consists of only "no" and "yes" are also binary. The second point is that, pday is a special feature. It has lots of -1 values, and several values are integer. Let's take a look at the description of this feature: number of days that passed by after the client was last contacted from a previous campaign (numeric; -1 means client was not previously contacted). Therefore, we need to specially deal with this feature. Because the meaning of -1 are totally different with the value >= 0, and most of the values are -1, causes an imbalance, so the number of non-negative value would not be that important, I decide to transfer this feature into a new binary feature, which is called previously conducted, where -1 values would be transformed as 0, and the other values would be transformed as 1.
+Second, we divided the features into three main categories: numerical, categorical, and binary. Binary features can be represented in different formats, such as 0 and 1 or "yes" and "no". These features were identified and processed according to their data types and meanings.
+
+One feature requiring special attention was pdays, which represents the number of days since a client was last contacted during a previous campaign. A value of -1 indicates that the client had not been previously contacted, while non-negative values indicate the number of days since the previous contact. Since -1 has a different meaning from non-negative values, treating all values as ordinary numerical observations would be inappropriate. Additionally, most observations had a value of -1. Therefore, we transformed pdays into a new binary feature called previously_contacted, where -1 was encoded as 0 and all non-negative values were encoded as 1. This transformation distinguishes clients who had been previously contacted from those who had not, although it removes information about the exact number of days since the previous contact.
 
 ```{python}
 X_train = bank_train.drop(columns="y")
@@ -207,9 +207,9 @@ X_test_processed = full_preprocessor.transform(X_test)
 
 For model training, we decide to take the Dummy Classifier as the baseline. And then we are going to set Logistic Regression and KNearestNeighbour as 2 candidates. All of the three models are trained with the same condition, which is 5-fold cross-validation. 
 
-As the DummyClassifier Model Result (Tabel .) shown below, the DummyClassifier achieved a validation accuracy of 0.883, while the f1 score is 0, which indicates that this model failed to identify customers who subscribed to a term deposit. This is might because of the class imbalance in the dataset.
+As the DummyClassifier Model Result (Table .) shown below, the DummyClassifier achieved a validation accuracy of 0.883, while the f1 score is 0, which indicates that this model failed to identify customers who subscribed to a term deposit. This is might because of the class imbalance in the dataset.
 
-Tabel. DummyClassifier Model Result
+Table. DummyClassifier Model Result
 ```{python}
 dummy_pipe = make_pipeline(
     full_preprocessor,
@@ -257,7 +257,7 @@ dummy_results = pd.DataFrame({
 display(dummy_results.round(3))
 ```
 
-As the Logistic Regression Model Result (Tabel ) shown below, we can see that Logistic Regression gets validation accuracy as 0.894, precision as 0.676, recall as 0.174, and F1 score as 0.277. We can see all of the data is higher than DummyClassifier model. This indicates that this model is a better choice compared with DummyClassifier model.
+As the Logistic Regression Model Result (Table ) shown below, we can see that Logistic Regression gets validation accuracy as 0.894, precision as 0.676, recall as 0.174, and F1 score as 0.277. We can see all of the data is higher than DummyClassifier model. This indicates that this model is a better choice compared with DummyClassifier model. Low reecall is one problem of Logistic Regression model. This means the model correctly identified only about 17.4% of customers who actually subscribed to a term deposit, missing approximately 82.6% of potential subscribers. It suggests that the model is relatively conservative when predicting the positive class. One possible reason is the class imbalance in the dataset, which may cause the model to favor the majority class. To improve recall, we could explore using class_weight="balanced" or adjusting the classification threshold, although these changes may reduce precision.
 
 Table. Logistic Regression Model Result
 ```{python}
@@ -294,9 +294,9 @@ reg_results = pd.DataFrame({
 display(reg_results.round(3))
 ```
 
-As the KNearestNeighbour (KNN) Model Result (Tabel .) shown below, we can see that KNN model gets accuracy as 0.884, precision as 0.506, recall as 0.192, F1 score as 0.278. All of the present data is also better than DummyClassifier model. This indicates that this model is better than DummyClassifier model.
+As the KNearestNeighbour (KNN) Model Result (Table .) shown below, we can see that KNN model gets accuracy as 0.884, precision as 0.506, recall as 0.192, F1 score as 0.278. All of the present data is also better than DummyClassifier model. This indicates that this model is better than DummyClassifier model.
 
-Tabel. KNearestNeighbour (KNN) Model Result
+Table. KNearestNeighbour (KNN) Model Result
 ```{python}
 knn_pipe = make_pipeline(
     full_preprocessor,
@@ -332,9 +332,9 @@ display(knn_results.round(3))
 ```
 
 
-As the Conclusion of data from three models (Tabel .) shown below, in comparison of Logestic Regression and KNearestNeighbour, we can find that the gap of f1 score of train and validation of Logestic Regression, which is about 0.01, is much smaller than the one of K-Nearest Neighbour model, which is about 0.12. This indicates that KNN model is might a bit overfitting.
+As the Conclusion of data from three models (Table .) shown below, in comparison of Logistic Regression and KNearestNeighbour, we can find that the gap of f1 score of train and validation of Logistic Regression, which is about 0.01, is much smaller than the one of K-Nearest Neighbour model, which is about 0.12. This indicates that KNN model is might a bit overfitting. However, improving recall remains an important direction for future model development.
 
-Tabel.  Conclusion of data from three models
+Table.  Conclusion of data from three models
 ```{python}
 comparison_df = pd.concat([
     dummy_results.assign(Model="Dummy"),
@@ -346,7 +346,7 @@ display(comparison_df)
 ```
  
 
-Therefore, we want to choose the Logestic Regression as the best model to use, because it provides comparable validation F1 performance and higher precision
+Therefore, we still want to choose the Logistic Regression as the best model to use, because it provides comparable validation F1 performance and higher precision.
 
 
 # Results & Discussion
