@@ -2275,7 +2275,7 @@ var requirejs,require,define;(function(global,setTimeout){var req,s,head,baseEle
 </header>
 
 
-<div id="6f65ffc6" class="cell" data-execution_count="1">
+<div id="9e8d0c08" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> zipfile</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
@@ -2305,7 +2305,7 @@ var requirejs,require,define;(function(global,setTimeout){var req,s,head,baseEle
 <h1>Methods</h1>
 <section id="data" class="level2">
 <h2 class="anchored" data-anchor-id="data">Data</h2>
-<div id="4740a8f8" class="cell" data-execution_count="2">
+<div id="b75f53fd" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># create the data folders if they don&#39;t exist</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>os.makedirs(<span class="st">&quot;../data/raw&quot;</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>os.makedirs(<span class="st">&quot;../data/processed&quot;</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
@@ -2325,13 +2325,13 @@ var requirejs,require,define;(function(global,setTimeout){var req,s,head,baseEle
 <span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> zipfile.ZipFile(<span class="st">&quot;../data/raw/bank.zip&quot;</span>) <span class="im">as</span> z:</span>
 <span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    z.extractall(<span class="st">&quot;../data/raw&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="179a9488" class="cell" data-execution_count="3">
+<div id="c36cc5f8" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># read in the full data set</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>bank <span class="op">=</span> pd.read_csv(<span class="st">&quot;../data/raw/bank-full.csv&quot;</span>, sep<span class="op">=</span><span class="st">&quot;;&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Before cleaning the data, we checked that the download was complete and that the file has no empty cells or duplicate rows (Table 1). These checks only confirm that the file was read correctly, so they do not use any information that could influence our modelling decisions.</p>
 <p>Table 1. Basic checks of the full data set.</p>
-<div id="4ac30a6e" class="cell" data-execution_count="4">
+<div id="a3da37cd" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>pd.DataFrame({</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Check&quot;</span>: [<span class="st">&quot;Number of rows&quot;</span>, <span class="st">&quot;Number of columns&quot;</span>, <span class="st">&quot;Empty cells&quot;</span>, <span class="st">&quot;Duplicate rows&quot;</span>],</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Result&quot;</span>: [</span>
@@ -2380,14 +2380,14 @@ var requirejs,require,define;(function(global,setTimeout){var req,s,head,baseEle
 </div>
 </div>
 <p>We removed the call duration variable before modelling. The duration of a call is only known after the call has ended, and by then the outcome (whether the client subscribed) is also known. A model that uses call duration therefore cannot help the bank decide which clients to call, which is the purpose of our analysis. This decision is based on the meaning of the variable, not on the data, so it is safe to make before splitting the data.</p>
-<div id="7d1ef268" class="cell" data-execution_count="5">
+<div id="b137f0c2" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># drop duration: it is only known after the call ends,</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># so it cannot be used to predict before calling a client</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>bank_clean <span class="op">=</span> bank.drop(columns<span class="op">=</span>[<span class="st">&quot;duration&quot;</span>])</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>bank_clean.to_csv(<span class="st">&quot;../data/processed/bank_clean.csv&quot;</span>, index<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>We then split the data into a training set (80%) and a test set (20%). We split the data before any further exploration, so that the test set does not influence any decision we make. Because only a small share of clients subscribed to a term deposit, we used a stratified split, which keeps the same proportion of subscribers in both sets.</p>
-<div id="aa7c544a" class="cell" data-execution_count="6">
+<div id="81084979" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># split the data into training (80%) and test (20%) sets</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>bank_train, bank_test <span class="op">=</span> train_test_split(</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    bank_clean,</span>
@@ -2404,7 +2404,7 @@ var requirejs,require,define;(function(global,setTimeout){var req,s,head,baseEle
 <h2 class="anchored" data-anchor-id="data-quality-in-the-training-set">Data quality in the training set</h2>
 <p>Although the data set has no empty cells, some categorical variables record missing information as the value “unknown” (Table 2). This affects four variables in the training set: job, education, contact type and the outcome of the previous campaign.</p>
 <p>Table 2. Number and percentage of “unknown” values in the training set, for the variables that contain them.</p>
-<div id="a1eb2544" class="cell" data-execution_count="7">
+<div id="075ef825" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># count &quot;unknown&quot; values in each column of the training set</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>unknown_counts <span class="op">=</span> (bank_train <span class="op">==</span> <span class="st">&quot;unknown&quot;</span>).<span class="bu">sum</span>()</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>unknown_counts <span class="op">=</span> unknown_counts[unknown_counts <span class="op">&gt;</span> <span class="dv">0</span>]</span>
@@ -2466,7 +2466,7 @@ var requirejs,require,define;(function(global,setTimeout){var req,s,head,baseEle
 </div>
 <p>To understand the “unknown” values in the previous campaign outcome, we compared this variable with the number of days since the client was last contacted in a previous campaign. The data set uses -1 for clients who were not previously contacted (Table 3).</p>
 <p>Table 3. Number of clients in the training set with an unknown previous campaign outcome, and how many of them were not previously contacted.</p>
-<div id="22cbb551" class="cell" data-execution_count="8">
+<div id="082a4a87" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># keep only the clients whose previous campaign outcome is &quot;unknown&quot;</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>unknown_poutcome <span class="op">=</span> bank_train[bank_train[<span class="st">&quot;poutcome&quot;</span>] <span class="op">==</span> <span class="st">&quot;unknown&quot;</span>]</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2512,7 +2512,7 @@ var requirejs,require,define;(function(global,setTimeout){var req,s,head,baseEle
 <p>The Python programming language (Van Rossum and Drake 2009) and the following Python packages were used to perform the analysis: requests (Reitz 2011), zipfile (Van Rossum and Drake 2009), NumPy (Harris et al. 2020), pandas (McKinney 2010), Altair (VanderPlas et al. 2018) and scikit-learn (Pedregosa et al. 2011). The code used to perform the analysis and create this report can be found here: https://github.ubc.ca/mds-2026-27/DSCI_561_lab1_wdz26.git</p>
 <p>Firstly, we are going to analyze the features manually with the meaning. The meaning of duration is last contact duration, in seconds (numeric). And the meaning of month is last contact month of year. Therefore, we don’t think these two features would have reasonable relationship with the term deposit description.</p>
 <p>Secondly, we will divide the features into different categories. The three main categories are numeric, categorical, and binary. Here are two points need to be mentioned. The first is that binary features are shown in different ways. Features whose values consists of only 0 and 1 are binray, consists of only “no” and “yes” are also binary. The second point is that, pday is a special feature. It has lots of -1 values, and several values are integer. Let’s take a look at the description of this feature: number of days that passed by after the client was last contacted from a previous campaign (numeric; -1 means client was not previously contacted). Therefore, we need to specially deal with this feature. Because the meaning of -1 are totally different with the value &gt;= 0, and most of the values are -1, causes an imbalance, so the number of non-negative value would not be that important, I decide to transfer this feature into a new binary feature, which is called previously conducted, where -1 values would be transformed as 0, and the other values would be transformed as 1.</p>
-<div id="f0594ce2" class="cell" data-execution_count="9">
+<div id="3c11b974" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>X_train <span class="op">=</span> bank_train.drop(columns<span class="op">=</span><span class="st">&quot;y&quot;</span>)</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>y_train <span class="op">=</span> bank_train[<span class="st">&quot;y&quot;</span>]</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2529,7 +2529,7 @@ var requirejs,require,define;(function(global,setTimeout){var req,s,head,baseEle
 <span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>binary_features <span class="op">=</span> [<span class="st">&quot;default&quot;</span>, <span class="st">&quot;housing&quot;</span>, <span class="st">&quot;loan&quot;</span>]</span>
 <span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>contacted_features <span class="op">=</span> [<span class="st">&quot;previously_contacted&quot;</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="2daf440d" class="cell" data-execution_count="10">
+<div id="09bd9d76" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>numeric_pipe <span class="op">=</span> make_pipeline(StandardScaler())</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>categorical_pipe <span class="op">=</span> make_pipeline(OneHotEncoder(handle_unknown<span class="op">=</span><span class="st">&quot;ignore&quot;</span>))</span>
@@ -2555,7 +2555,10 @@ var requirejs,require,define;(function(global,setTimeout){var req,s,head,baseEle
 <span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>X_train_processed <span class="op">=</span> full_preprocessor.fit_transform(X_train)</span>
 <span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>X_test_processed <span class="op">=</span> full_preprocessor.transform(X_test)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="5aa968b4" class="cell" data-execution_count="11">
+<p>For model training, we decide to take the Dummy Classifier as the baseline. And then we are going to set Logistic Regression and KNearestNeighbour as 2 candidates. All of the three models are trained with the same condition, which is 5-fold cross-validation.</p>
+<p>As the DummyClassifier Model Result (Tabel .) shown below, the DummyClassifier achieved a validation accuracy of 0.883, while the f1 score is 0, which indicates that this model failed to identify customers who subscribed to a term deposit. This is might because of the class imbalance in the dataset.</p>
+<p>Tabel. DummyClassifier Model Result</p>
+<div id="0bb4629a" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>dummy_pipe <span class="op">=</span> make_pipeline(</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    full_preprocessor,</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    DummyClassifier(strategy<span class="op">=</span><span class="st">&quot;most_frequent&quot;</span>)</span>
@@ -2597,9 +2600,56 @@ var requirejs,require,define;(function(global,setTimeout){var req,s,head,baseEle
 <span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a>        dummy_scores[<span class="st">&quot;test_recall&quot;</span>].mean(),</span>
 <span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a>        dummy_scores[<span class="st">&quot;test_f1&quot;</span>].mean()</span>
 <span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a>    ]</span>
-<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a>display(dummy_results.<span class="bu">round</span>(<span class="dv">3</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Metric</th>
+<th data-quarto-table-cell-role="th">Train</th>
+<th data-quarto-table-cell-role="th">Validation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>Accuracy</td>
+<td>0.883</td>
+<td>0.883</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>Precision</td>
+<td>0.000</td>
+<td>0.000</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>Recall</td>
+<td>0.000</td>
+<td>0.000</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">3</th>
+<td>F1</td>
+<td>0.000</td>
+<td>0.000</td>
+</tr>
+</tbody>
+</table>
+
 </div>
-<div id="bc5af188" class="cell" data-execution_count="12">
+</div>
+</div>
+<p>As the Logistic Regression Model Result (Tabel ) shown below, we can see that Logistic Regression gets validation accuracy as 0.894, precision as 0.676, recall as 0.174, and F1 score as 0.277. We can see all of the data is higher than DummyClassifier model. This indicates that this model is a better choice compared with DummyClassifier model.</p>
+<p>Table. Logistic Regression Model Result</p>
+<div id="314e3863" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>reg_pipe <span class="op">=</span> make_pipeline(</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    full_preprocessor,</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    LogisticRegression(max_iter<span class="op">=</span><span class="dv">2000</span>, random_state<span class="op">=</span><span class="dv">123</span>)</span>
@@ -2628,9 +2678,56 @@ var requirejs,require,define;(function(global,setTimeout){var req,s,head,baseEle
 <span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>        reg_scores[<span class="st">&quot;test_recall&quot;</span>].mean(),</span>
 <span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>        reg_scores[<span class="st">&quot;test_f1&quot;</span>].mean()</span>
 <span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>    ]</span>
-<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a>display(reg_results.<span class="bu">round</span>(<span class="dv">3</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Metric</th>
+<th data-quarto-table-cell-role="th">Train</th>
+<th data-quarto-table-cell-role="th">Validation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>Accuracy</td>
+<td>0.894</td>
+<td>0.894</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>Precision</td>
+<td>0.679</td>
+<td>0.676</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>Recall</td>
+<td>0.175</td>
+<td>0.174</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">3</th>
+<td>F1</td>
+<td>0.279</td>
+<td>0.277</td>
+</tr>
+</tbody>
+</table>
+
 </div>
-<div id="b6809767" class="cell" data-execution_count="13">
+</div>
+</div>
+<p>As the KNearestNeighbour (KNN) Model Result (Tabel .) shown below, we can see that KNN model gets accuracy as 0.884, precision as 0.506, recall as 0.192, F1 score as 0.278. All of the present data is also better than DummyClassifier model. This indicates that this model is better than DummyClassifier model.</p>
+<p>Tabel. KNearestNeighbour (KNN) Model Result</p>
+<div id="0a67ade2" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>knn_pipe <span class="op">=</span> make_pipeline(</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    full_preprocessor,</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    KNeighborsClassifier(n_neighbors<span class="op">=</span><span class="dv">5</span>)</span>
@@ -2659,42 +2756,169 @@ var requirejs,require,define;(function(global,setTimeout){var req,s,head,baseEle
 <span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>        knn_scores[<span class="st">&quot;test_recall&quot;</span>].mean(),</span>
 <span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>        knn_scores[<span class="st">&quot;test_f1&quot;</span>].mean()</span>
 <span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>    ]</span>
-<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>display(knn_results.<span class="bu">round</span>(<span class="dv">3</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Metric</th>
+<th data-quarto-table-cell-role="th">Train</th>
+<th data-quarto-table-cell-role="th">Validation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>Accuracy</td>
+<td>0.903</td>
+<td>0.884</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>Precision</td>
+<td>0.720</td>
+<td>0.506</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>Recall</td>
+<td>0.278</td>
+<td>0.192</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">3</th>
+<td>F1</td>
+<td>0.401</td>
+<td>0.278</td>
+</tr>
+</tbody>
+</table>
+
 </div>
-<div id="b1b81cd6" class="cell" data-execution_count="14">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>knn_pipe <span class="op">=</span> make_pipeline(</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    full_preprocessor,</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    KNeighborsClassifier(n_neighbors<span class="op">=</span><span class="dv">5</span>)</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>knn_scores <span class="op">=</span> cross_validate(</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    knn_pipe,</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    X_train,</span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    y_train,</span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    cv<span class="op">=</span>cv,</span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>    scoring<span class="op">=</span>scoring,</span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>    return_train_score<span class="op">=</span><span class="va">True</span></span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>knn_results <span class="op">=</span> pd.DataFrame({</span>
-<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Metric&quot;</span>: [<span class="st">&quot;Accuracy&quot;</span>, <span class="st">&quot;Precision&quot;</span>, <span class="st">&quot;Recall&quot;</span>, <span class="st">&quot;F1&quot;</span>],</span>
-<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Train&quot;</span>: [</span>
-<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>        knn_scores[<span class="st">&quot;train_accuracy&quot;</span>].mean(),</span>
-<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>        knn_scores[<span class="st">&quot;train_precision&quot;</span>].mean(),</span>
-<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>        knn_scores[<span class="st">&quot;train_recall&quot;</span>].mean(),</span>
-<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>        knn_scores[<span class="st">&quot;train_f1&quot;</span>].mean()</span>
-<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>    ],</span>
-<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Validation&quot;</span>: [</span>
-<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>        knn_scores[<span class="st">&quot;test_accuracy&quot;</span>].mean(),</span>
-<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>        knn_scores[<span class="st">&quot;test_precision&quot;</span>].mean(),</span>
-<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>        knn_scores[<span class="st">&quot;test_recall&quot;</span>].mean(),</span>
-<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>        knn_scores[<span class="st">&quot;test_f1&quot;</span>].mean()</span>
-<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>    ]</span>
-<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>We decide to take the Dummy Classifier as the baseline. And then we are going to set Logistic Regression and KNearestNeighbour as 2 candidates. All of the three models are trained with the same condition, which is 5-fold cross-validation.</p>
-<p>The DummyClassifier achieved a validation accuracy of 0.883, while the f1 score is 0, which indicates that this model failed to identify customers who subscribed to a term deposit. This is might because of the class imbalance in the dataset. Logistic Regression achieved the highest validation accuracy as 0.894, with the precision as 0.676, with an F1 score of 0.277. KNN achieved a slightly higher F1 score as 0.278, with the recall as 0.192, but its precision was lower as 0.506. In comparison of Logestic Regression and KNearestNeighbour, we can find that the gap of f1 score of train and validation of Logestic Regression, which is about 0.01, is much smaller than the one of K-Nearest Neighbour model, which is about 0.12.</p>
-<p>Therefore, we want to choose the Logestic Regression as the best model to use.</p>
+</div>
+<p>As the Conclusion of data from three models (Tabel .) shown below, in comparison of Logestic Regression and KNearestNeighbour, we can find that the gap of f1 score of train and validation of Logestic Regression, which is about 0.01, is much smaller than the one of K-Nearest Neighbour model, which is about 0.12. This indicates that KNN model is might a bit overfitting.</p>
+<p>Tabel. Conclusion of data from three models</p>
+<div id="32d441d1" class="cell" data-execution_count="14">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>comparison_df <span class="op">=</span> pd.concat([</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    dummy_results.assign(Model<span class="op">=</span><span class="st">&quot;Dummy&quot;</span>),</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    reg_results.assign(Model<span class="op">=</span><span class="st">&quot;Logistic Regression&quot;</span>),</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    knn_results.assign(Model<span class="op">=</span><span class="st">&quot;KNN&quot;</span>)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>], ignore_index<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>display(comparison_df)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Metric</th>
+<th data-quarto-table-cell-role="th">Train</th>
+<th data-quarto-table-cell-role="th">Validation</th>
+<th data-quarto-table-cell-role="th">Model</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>Accuracy</td>
+<td>0.883018</td>
+<td>0.883018</td>
+<td>Dummy</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>Precision</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>Dummy</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>Recall</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>Dummy</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">3</th>
+<td>F1</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>Dummy</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">4</th>
+<td>Accuracy</td>
+<td>0.893829</td>
+<td>0.893608</td>
+<td>Logistic Regression</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">5</th>
+<td>Precision</td>
+<td>0.678685</td>
+<td>0.675878</td>
+<td>Logistic Regression</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">6</th>
+<td>Recall</td>
+<td>0.175491</td>
+<td>0.174191</td>
+<td>Logistic Regression</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">7</th>
+<td>F1</td>
+<td>0.278863</td>
+<td>0.276951</td>
+<td>Logistic Regression</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">8</th>
+<td>Accuracy</td>
+<td>0.902870</td>
+<td>0.883599</td>
+<td>KNN</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">9</th>
+<td>Precision</td>
+<td>0.719778</td>
+<td>0.506028</td>
+<td>KNN</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">10</th>
+<td>Recall</td>
+<td>0.277948</td>
+<td>0.191914</td>
+<td>KNN</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">11</th>
+<td>F1</td>
+<td>0.401010</td>
+<td>0.278224</td>
+<td>KNN</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Therefore, we want to choose the Logestic Regression as the best model to use, because it provides comparable validation F1 performance and higher precision</p>
 </section>
 </section>
 <section id="results" class="level1">
