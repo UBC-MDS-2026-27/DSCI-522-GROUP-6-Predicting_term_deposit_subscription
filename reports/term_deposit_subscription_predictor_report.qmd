@@ -159,10 +159,7 @@ Almost all clients with an unknown previous campaign outcome (29,563 of 29,567, 
 
 ## Exploratory data analysis (EDA)
 ### Target class composition
-To evaluate the predictors and select a testing approach, we need to find the class composition in the target 
-and see if the classes are balanced or not. (Figure 1) And the target class composition table tells us that there is massive 
-class imbalance in the data 88.3% of the target being no. So, conventional accuracy score would not be a good scoring metric. 
-Therefore, we also need to use F1, precision and recall as scoring metrics.
+To choose suitable evaluation metrics, we first checked whether the target classes are balanced (Table 4 and Figure 1). The classes are highly imbalanced: 88.3% of the clients in the training set did not subscribe. Accuracy alone would therefore be misleading, so we also used precision, recall and F1 score.
 
 
 **Table 4.** Target class composition in the training data
@@ -199,7 +196,7 @@ target_chart = (
         y=alt.Y("count:Q", title = "Number of clients"),
         color=alt.Color("subscribed:N", legend = None)
     )
-    .properties(width=150, height=250, title="Class distribution of the target in training data")
+    .properties(width=150, height=250)
 )
 
 target_chart
@@ -207,10 +204,7 @@ target_chart
 **Figure 1.** Class imbalance of the target in training data for term deposit subscription 
 
 ### Descriptive summary of individual features
-Our first glance at the individual features starts with a descriptive summary of individual features divided into numeric and categorical feature summary. From the numeric feature summary table, we can see that there is 
-heavy right skewness in the data and the scales of each feature vary wildly. The range of age and campaign are both within 0-100 (18 to 95 and 1 to 63 respectively) whereas the range for balance and previous ranges from -8019 to 102,127 and from 0 to 275 respectively,
-which indicates that we have to include a scaler in the pipeline for numeric features. Moreover, there's another numeric feature  pdays which ranges from -1 to 871 but in reality, it only carries one useful signal which is whether the client was contacted before or not. 
-So, for that reason we will be converting pdays to a binary feature previously_contacted down the line for the charts, training and fitting. 
+We first looked at summary statistics of the numeric features (Table 5). The numeric features are heavily right-skewed, and their scales vary widely: age ranges from 18 to 95 and campaign contacts from 1 to 63, while balance ranges from -8,019 to 102,127 euros and previous contacts from 0 to 275. We therefore included a scaler for the numeric features in our pipeline. The number of days since the previous contact ranges from -1 to 871, but its only useful signal is whether the client was contacted before, so we converted it into a binary feature for the charts and the model. 
 
 **Table 5.** Summary of numeric features
 
@@ -236,7 +230,7 @@ num_summary = (
 num_summary.index.name = "Feature"
 num_summary
 ```
-Now, for the summary of categorical features we check the levels of each category and their proportions in their respective category. 
+Table 6 summarizes the categorical features: the number of levels, the most common level and its share, and whether the feature contains "unknown" values.
 
 **Table 6.** Summary of categorical features
 
@@ -266,10 +260,7 @@ cat_summary["Has 'unknown'"] = cat_summary["Has 'unknown'"].map({True: "Yes", Fa
 cat_summary
 ```
 ### Binary features
-To look at whether the categorical and binary features are useful to predict term deposit subscription, we plot the features as bar charts. The pattern we want to find is whether subscription differed for different levels of the same category and if it differed, then by how much. 
-For that, we calculate the subscription rate in each category for its respective levels and compare those rates in the bar chart. We divide it into 3 faceted bar charts; one for binary features, one for categorical features with 3/4 categories and the other for categorical features
-with more than 4 categories. From Figure 2, we can see previously_contacted has a stronger signal than the others, with around 15 percentage points more subscription rate if the client was contacted before compared to a first contact. Housing also has a good signal with a difference of around
-10 percentage points more subscription rate among clients that don't have a housing loan compared to the clients who do. 
+To see whether the binary and categorical features are useful for predicting subscription, we calculated the subscription rate for each level of each feature and compared these rates in bar charts. We split them into three charts: one for binary features, one for categorical features with 3 or 4 levels, and one for categorical features with more than 4 levels. Figure 2 shows that previous contact has the strongest signal among the binary features: clients who were contacted before had a subscription rate about 15 percentage points higher than clients contacted for the first time. Having a housing loan also shows a clear difference: clients without a housing loan had a subscription rate about 10 percentage points higher than clients with one.
 
 ```{python}
 def subscription_rate(df, col):
@@ -279,7 +270,15 @@ def subscription_rate(df, col):
         .reset_index(name="rate")
     )
 
-bank_train_eda = bank_train.assign(previously_contacted = (bank_train["pdays"]!= -1))
+bank_train_eda = bank_train.assign(previously_contacted = (bank_train["pdays"]!= -1).map({True: "yes", False: "no"}))
+
+feature_labels = {
+    "housing": "Housing loan", "loan": "Personal loan",
+    "default": "Credit in default", "previously_contacted": "Previously contacted",
+    "contact": "Contact type", "education": "Education",
+    "marital": "Marital status", "poutcome": "Previous campaign outcome",
+    "month": "Last contact month", "job": "Job"
+}
 
 bi_cols = ["housing", "loan", "default", "previously_contacted"]
 
@@ -287,7 +286,7 @@ bi_perc = []
 
 for col in bi_cols:
     r = subscription_rate(bank_train_eda, col).rename(columns = {col:"category"})
-    r ["feature"] = col
+    r ["feature"] = feature_labels[col]
     bi_perc.append(r)
 
 rates_bi = pd.concat(bi_perc, ignore_index=True)
@@ -299,13 +298,10 @@ bi_chart = (
         x=alt.X("rate:Q", title = "Subscription rate", axis=alt.Axis(format="%")),
         y=alt.Y("category:N", sort = "-x", title = None)
         )
-    .properties(width=130, height=100)
-    .facet(facet="feature:N", columns=2)
+    .properties(width=150, height=100)
+    .facet(facet=alt.Facet("feature:N", title=None), columns=2)
     .resolve_scale(y="independent")
-    .properties(title = alt.TitleParams(
-        text="Binary features with Subscription rate",
-        anchor="middle"))
-    )
+)
 
 bi_chart
 ```
@@ -313,9 +309,7 @@ bi_chart
 
 
 ### Categorical features
-Next, let's look at categorical features with 3/4 levels. Among those 4 categories, it is evident from Figure 3 that for marital, contact, and education, the subscription rate doesn't vary that much across levels. But for previous campaign outcome (poutcome), the subscription rate for clients 
-who were also a success in the previous campaign is much higher compared to other levels. For categories with more than 4 levels (Figure 4), month also has higher subscription rate in the months of March, September, October and December. For jobs, an interesting finding is students who conventionally 
-don't have a fixed income have the highest subscription rate among all the jobs. But the levels in job category don't vary by a large magnitude like poutcome, so signal from this category would be relatively weaker. 
+Next, we looked at the categorical features with 3 or 4 levels (Figure 3). For marital status, contact type and education, the subscription rate does not vary much across levels. For the previous campaign outcome, however, clients whose previous campaign was a success have a much higher subscription rate than clients with other outcomes. Among the categorical features with more than 4 levels (Figure 4), the last contact month shows higher subscription rates in March, September, October and December. For job, students, who usually do not have fixed income, have the highest subscription rate. However, the differences between jobs are smaller than for the previous campaign outcome, so job is likely a weaker signal.
 
 
 ```{python}
@@ -325,7 +319,7 @@ cat_perc34 = []
 
 for col in cat_cols34:
     r = subscription_rate(bank_train_eda, col).rename(columns = {col:"category"})
-    r ["feature"] = col
+    r ["feature"] = feature_labels[col]
     cat_perc34.append(r)
 
 rates_cat34 = pd.concat(cat_perc34, ignore_index=True)
@@ -337,13 +331,10 @@ cat34_chart = (
         x=alt.X("rate:Q", title = "Subscription rate", axis=alt.Axis(format="%")),
         y=alt.Y("category:N", sort = "-x", title = None)
         )
-    .properties(width=100, height=100)
-    .facet(facet="feature:N", columns=2)
+    .properties(width=150, height=100)
+    .facet(facet=alt.Facet("feature:N", title=None), columns=2)
     .resolve_scale(y="independent")
-    .properties(title = alt.TitleParams(
-        text=["Categorical features(3/4 categories)", "With Subscription rate"],
-        anchor="middle"))
-    )
+)
 
 
 cat34_chart
@@ -358,7 +349,7 @@ cat_perc_more = []
 
 for col in cat_cols_more:
     r = subscription_rate(bank_train_eda, col).rename(columns = {col:"category"})
-    r ["feature"] = col
+    r ["feature"] = feature_labels[col]
     cat_perc_more.append(r)
 
 rates_cat_more = pd.concat(cat_perc_more, ignore_index=True)
@@ -370,21 +361,16 @@ cat_more_chart = (
         x=alt.X("rate:Q", title = "Subscription rate", axis=alt.Axis(format="%")),
         y=alt.Y("category:N", sort = "-x", title = None)
         )
-    .properties(width=100, height=120)
-    .facet(facet="feature:N", columns=2)
+    .properties(width=150, height=220)
+    .facet(facet=alt.Facet("feature:N", title=None), columns=2)
     .resolve_scale(y="independent")
-    .properties(title = alt.TitleParams(
-        text=["Categorical features( >4 categories)", "With Subscription rate"],
-        anchor="middle"))
-    )
-
+)
 
 cat_more_chart
 ```
 **Figure 4.** Comparison of term deposit subscription rate between categorical features of training data with more than 4 levels 
 
-Let's compare the one category that stands out to the baseline average subscription rate in Figure 5. From this bar chart, we can see that the subscription rate for 
-success in poutcome is really high (49 percentage points more than next highest level) compared to the baseline and all the other levels. This indicates that poutcome is a good indicator for the target. 
+Figure 5 compares the subscription rate for each previous campaign outcome with the baseline subscription rate (dashed line). Clients whose previous campaign was a success had a much higher subscription rate than the baseline and than all other outcomes (49 percentage points higher than the next highest outcome). This suggests that the previous campaign outcome is a strong predictor of subscription.
 
 ```{python}
 baseline = (bank_train["y"] == "yes").mean()
@@ -400,10 +386,7 @@ poutcome_chart = (
         x=alt.X("rate:Q", title = "Subscription rate", axis=alt.Axis(format="%")),
         y=alt.Y("poutcome:N", sort = order, title = "Previous campaign outcome"), 
     )
-    .properties(width=200, height=200, title = alt.TitleParams(
-        text=["Subscription rate based on", "Previous campaign outcome"],
-        anchor="middle"))
-    
+    .properties(width=200, height=200)
 )
 
 baseline_rule = alt.Chart(alt.Data(values=[{"b":baseline}])).mark_rule(strokeDash =[4,4]).encode(x="b:Q")
@@ -421,11 +404,7 @@ poutcome_chart + baseline_rule +labels
 **Figure 5.** Comparison between different levels of previous campaign outcome and the baseline average subscription rate 
 
 ### Numeric features
-Before analyzing the numeric features, we want to note that from the descriptive summary, it looks like two of the numeric features are right skewed where mean is way above the median (balance and campaign) so, we are plotting the numeric features as boxplots
-to understand the skewness of the data and to see if the numeric data (namely the median and IQR) behave differently for people who subscribe compared to people who didn't. So, from Figure 6 below, we can see that medians across all 4 numeric features are 
-nearly the same for both subscribers and non subscribers. The IQRs for all 4 features also have a lot of overlap which means that the numeric features are weaker signals compared to the categorical features. Two features worth mentioning are campaign and balance. 
-From campaign feature (the number of contacts during this campaign), we can see that the subscribers tend to have fewer contacts compared to non subscribers. That means making more contacts with a potential client doesn't necessarily convert them. The ones that subscribe, 
-tend to do so without needing a lot of followups or contacts. Moreover, the balance features show that subscribers tend to have higher balances, and negative balances are rare among them. 
+In the descriptive summary (Table 5), the means of balance and campaign contacts are much higher than their medians, which shows that these features are right-skewed. We therefore plotted the numeric features as boxplots, to see whether their medians and interquartile ranges (IQRs) differ between clients who subscribed and clients who did not (Figure 6). The medians of all four numeric features are nearly the same for both groups, and their IQRs overlap a lot, which suggests that the numeric features are weaker signals than the categorical features. Two features are worth mentioning: subscribers tend to have higher balances, and negative balances are rare among them. Some clients who did not subscribe were contacted many times during this campaign (outliers not shown in Figure 6), which suggests that calling a client more often does not necessarily lead to subscription.
 
 ```{python}
 
@@ -436,26 +415,31 @@ num_df = bank_train.melt(
     var_name="feature", value_name = "value"
 )
 
+num_labels = {
+    "age": "Age (years)", "balance": "Balance (euros)",
+    "campaign": "Contacts in this campaign", "previous": "Contacts before this campaign"
+}
+num_df["feature"] = num_df["feature"].map(num_labels)
+
 alt.data_transformers.enable("vegafusion")
 
 num_chart = (
     alt.Chart(num_df)
-    .mark_boxplot()
+    .mark_boxplot(outliers=False)
     .encode(
         x=alt.X("y:N", title="Subscribed", axis=alt.Axis(labelAngle =0)),
         y=alt.Y("value:Q", title=None),
         color=alt.Color("y:N", legend=None)
     )
     .properties(width=120, height=100)
-    .facet(facet="feature:N", columns = 2)
+    .facet(facet=alt.Facet("feature:N", title=None), columns = 2)
     .resolve_scale(y="independent")
-    .properties(title = "Numeric features with subscription outcome")
 )
 
 
 num_chart
 ```
-**Figure 6.** Distributions of numeric features of training data by subscription outcome 
+**Figure 6.** Distributions of numeric features of training data by subscription outcome (outliers not shown)
 
 ## Analysis
 The Python programming language (Van Rossum and Drake 2009) and the following Python packages were used to perform the analysis: requests (Reitz 2011), zipfile (Van Rossum and Drake 2009), NumPy (Harris et al. 2020), pandas (McKinney 2010), Altair (VanderPlas et al. 2018) and scikit-learn (Pedregosa et al. 2011). The code used to perform the analysis and create this report can be found here: <https://github.com/UBC-MDS-2026-27/DSCI-522-GROUP-6-Predicting_term_deposit_subscription>.
@@ -464,7 +448,7 @@ First, we examined the features based on their definitions and relevance to pred
 
 Second, we divided the features into three main categories: numerical, categorical, and binary. Binary features can be represented in different formats, such as 0 and 1 or "yes" and "no". These features were identified and processed according to their data types and meanings.
 
-One feature requiring special attention was pdays, which represents the number of days since a client was last contacted during a previous campaign. A value of -1 indicates that the client had not been previously contacted, while non-negative values indicate the number of days since the previous contact. Since -1 has a different meaning from non-negative values, treating all values as ordinary numerical observations would be inappropriate. Additionally, most observations had a value of -1. Therefore, we transformed pdays into a new binary feature called previously_contacted, where -1 was encoded as 0 and all non-negative values were encoded as 1. This transformation distinguishes clients who had been previously contacted from those who had not, although it removes information about the exact number of days since the previous contact.
+One feature requiring special attention was `pdays`, which represents the number of days since a client was last contacted during a previous campaign. A value of -1 indicates that the client had not been previously contacted, while non-negative values indicate the number of days since the previous contact. Since -1 has a different meaning from non-negative values, treating all values as ordinary numerical observations would be inappropriate. Additionally, most observations had a value of -1. Therefore, we transformed `pdays` into a new binary feature called `previously_contacted`, where -1 was encoded as 0 and all non-negative values were encoded as 1. This transformation distinguishes clients who had been previously contacted from those who had not, although it removes information about the exact number of days since the previous contact.
 
 We treated the month of the last contact as a categorical feature, because months have no natural order that matters for subscription, and the subscription rate differed a lot between months (Figure 4). We dropped the day of the month, because treating it as a numeric feature would mean that day 31 is "more" than day 1, and it was not clearly linked to subscription.
 
@@ -513,11 +497,12 @@ X_train_processed = full_preprocessor.fit_transform(X_train)
 X_test_processed = full_preprocessor.transform(X_test)
 ```
 
-For model training, we decide to take the Dummy Classifier as the baseline. And then we are going to set Logistic Regression and KNearestNeighbour as 2 candidates. All of the three models are trained with the same condition, which is 5-fold cross-validation. 
+We used a Dummy Classifier as the baseline and compared it with two candidate models: Logistic Regression and K-Nearest Neighbours. All three models were evaluated with 5-fold cross-validation.
 
-As the DummyClassifier Model Result (Table .) shown below, the DummyClassifier achieved a validation accuracy of 0.883, while the f1 score is 0, which indicates that this model failed to identify customers who subscribed to a term deposit. This is might because of the class imbalance in the dataset.
+As Table 7 shows, the Dummy Classifier achieved a validation accuracy of 0.883, but its F1 score was 0, which means that it did not identify any clients who subscribed to a term deposit. This is because it always predicts the most common class ("no"), and 88.3% of the clients in the training set did not subscribe.
 
-Table. DummyClassifier Model Result
+**Table 7.** Cross-validation results of the Dummy Classifier.
+
 ```{python}
 dummy_pipe = make_pipeline(
     full_preprocessor,
@@ -562,12 +547,13 @@ dummy_results = pd.DataFrame({
     ]
 })
 
-display(dummy_results.round(3))
+display(dummy_results.set_index("Metric").round(3))
 ```
 
-As the Logistic Regression Model Result (Table ) shown below, we can see that Logistic Regression gets validation accuracy as 0.893, precision as 0.641, recall as 0.189, and F1 score as 0.292. We can see all of the data is higher than DummyClassifier model. This indicates that this model is a better choice compared with DummyClassifier model. Low reecall is one problem of Logistic Regression model. This means the model correctly identified only about 18.9% of customers who actually subscribed to a term deposit, missing approximately 81.1% of potential subscribers. It suggests that the model is relatively conservative when predicting the positive class. One possible reason is the class imbalance in the dataset, which may cause the model to favor the majority class. To improve recall, we could explore using class_weight="balanced" or adjusting the classification threshold, although these changes may reduce precision.
+As Table 8 shows, Logistic Regression had a validation accuracy of 0.893, a precision of 0.641, a recall of 0.189 and an F1 score of 0.292. All of these scores are higher than those of the Dummy Classifier, so this model is a better choice than the baseline. Low recall is one problem of the Logistic Regression model: it correctly identified only about 18.9% of the clients who actually subscribed to a term deposit, and missed approximately 81.1% of them. This suggests that the model is relatively conservative when predicting the positive class. One possible reason is the class imbalance in the data set, which may cause the model to favour the majority class. To improve recall, we could use `class_weight="balanced"` or adjust the classification threshold, although these changes may reduce precision.
 
-Table. Logistic Regression Model Result
+**Table 8.** Cross-validation results of Logistic Regression.
+
 ```{python}
 reg_pipe = make_pipeline(
     full_preprocessor,
@@ -599,12 +585,13 @@ reg_results = pd.DataFrame({
     ]
 })
 
-display(reg_results.round(3))
+display(reg_results.set_index("Metric").round(3))
 ```
 
-As the KNearestNeighbour (KNN) Model Result (Table .) shown below, we can see that KNN model gets accuracy as 0.886, precision as 0.536, recall as 0.211, F1 score as 0.303. All of the present data is also better than DummyClassifier model. This indicates that this model is better than DummyClassifier model.
+As Table 9 shows, the KNN model had a validation accuracy of 0.886, a precision of 0.536, a recall of 0.211 and an F1 score of 0.303. All of these scores are higher than those of the Dummy Classifier.
 
-Table. KNearestNeighbour (KNN) Model Result
+**Table 9.** Cross-validation results of K-Nearest Neighbours.
+
 ```{python}
 knn_pipe = make_pipeline(
     full_preprocessor,
@@ -636,13 +623,14 @@ knn_results = pd.DataFrame({
     ]
 })
 
-display(knn_results.round(3))
+display(knn_results.set_index("Metric").round(3))
 ```
 
 
-As the Conclusion of data from three models (Table .) shown below, in comparison of Logistic Regression and KNearestNeighbour, we can find that the gap of f1 score of train and validation of Logistic Regression, which is about 0.005, is much smaller than the one of K-Nearest Neighbour model, which is about 0.13. This indicates that KNN model is might a bit overfitting. However, improving recall remains an important direction for future model development.
+As Table 10 shows, the gap between the training and validation F1 scores of Logistic Regression (about 0.005) is much smaller than that of K-Nearest Neighbours (about 0.13). This suggests that the KNN model may be overfitting. However, improving recall remains an important direction for future model development.
 
-Table.  Conclusion of data from three models
+**Table 10.** Validation scores of the three models.
+
 ```{python}
 comparison_df = pd.concat([
     dummy_results.assign(Model="Dummy"),
@@ -650,16 +638,16 @@ comparison_df = pd.concat([
     knn_results.assign(Model="KNN")
 ], ignore_index=True)
 
-display(comparison_df.round(3))
+display(comparison_df.pivot(index="Model", columns="Metric", values="Validation")[["Accuracy", "Precision", "Recall", "F1"]].round(3))
 ```
 
 Therefore, we chose Logistic Regression as our final model. Although KNN had a slightly higher validation F1 score (0.303 compared with 0.292), Logistic Regression had a higher validation precision (0.641 compared with 0.536) and a much smaller gap between its training and validation F1 scores, which means it is less likely to be overfitting.
 
 # Results
 
-We fitted the final Logistic Regression model on the whole training set and evaluated it once on the test set (Table .). The model reached an accuracy of 0.889, which is only slightly higher than the accuracy of the Dummy Classifier (0.883), because most clients in the test set did not subscribe. Its precision was 0.584, which means that when the model predicted that a client would subscribe, it was correct about 58.4% of the time. However, its recall was only 0.170, so the model found only about 17% of the clients who actually subscribed. The test scores were slightly lower than the cross-validation scores, which suggests that the model's performance on new data is close to what we expected.
+We fitted the final Logistic Regression model on the whole training set and evaluated it once on the test set (Table 11). The model reached an accuracy of 0.889, which is only slightly higher than the accuracy of the Dummy Classifier (0.883), because most clients in the test set did not subscribe. Its precision was 0.584, which means that when the model predicted that a client would subscribe, it was correct about 58.4% of the time. However, its recall was only 0.170, so the model found only about 17% of the clients who actually subscribed. The test scores were slightly lower than the cross-validation scores, which suggests that the model's performance on new data is close to what we expected.
 
-**Table .** Performance of the final Logistic Regression model on the test set.
+**Table 11.** Performance of the final Logistic Regression model on the test set.
 
 ```{python}
 # fit the final model on the whole training set
