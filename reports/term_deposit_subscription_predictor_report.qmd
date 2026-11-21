@@ -342,7 +342,7 @@ comparison_df = pd.concat([
     knn_results.assign(Model="KNN")
 ], ignore_index=True)
 
-display(comparison_df)
+display(comparison_df.round(3))
 ```
  
 
