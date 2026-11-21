@@ -11,6 +11,12 @@ format:
   pdf:
     toc: true
     code-overflow: wrap
+    geometry:
+        - margin=0.75in
+    include-in-header:
+        text: |
+            \usepackage{fvextra}
+            \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
 ---
 
 ```{python}
@@ -149,9 +155,9 @@ n_unknown = len(unknown_poutcome)
 n_not_contacted = (unknown_poutcome["pdays"] == -1).sum()
 
 pd.DataFrame({
-    "Clients with unknown previous outcome": [n_unknown],
-    "Of these, not previously contacted": [n_not_contacted],
-    "Percent not previously contacted": [round(n_not_contacted / n_unknown * 100, 2)]
+    "Unknown previous outcome": [n_unknown],
+    "Not previously contacted": [n_not_contacted],
+    "Percent": [round(n_not_contacted / n_unknown * 100, 2)]
 }, index=["Training set"])
 ```
 
@@ -298,7 +304,7 @@ bi_chart = (
         x=alt.X("rate:Q", title = "Subscription rate", axis=alt.Axis(format="%")),
         y=alt.Y("category:N", sort = "-x", title = None)
         )
-    .properties(width=150, height=100)
+    .properties(width=120, height=100)
     .facet(facet=alt.Facet("feature:N", title=None), columns=2)
     .resolve_scale(y="independent")
 )
@@ -331,7 +337,7 @@ cat34_chart = (
         x=alt.X("rate:Q", title = "Subscription rate", axis=alt.Axis(format="%")),
         y=alt.Y("category:N", sort = "-x", title = None)
         )
-    .properties(width=150, height=100)
+    .properties(width=100, height=100)
     .facet(facet=alt.Facet("feature:N", title=None), columns=2)
     .resolve_scale(y="independent")
 )
@@ -361,7 +367,7 @@ cat_more_chart = (
         x=alt.X("rate:Q", title = "Subscription rate", axis=alt.Axis(format="%")),
         y=alt.Y("category:N", sort = "-x", title = None)
         )
-    .properties(width=150, height=220)
+    .properties(width=100, height=220)
     .facet(facet=alt.Facet("feature:N", title=None), columns=2)
     .resolve_scale(y="independent")
 )
@@ -442,7 +448,7 @@ num_chart
 **Figure 6.** Distributions of numeric features of training data by subscription outcome (outliers not shown)
 
 ## Analysis
-The Python programming language (Van Rossum and Drake 2009) and the following Python packages were used to perform the analysis: requests (Reitz 2011), zipfile (Van Rossum and Drake 2009), NumPy (Harris et al. 2020), pandas (McKinney 2010), Altair (VanderPlas et al. 2018) and scikit-learn (Pedregosa et al. 2011). The code used to perform the analysis and create this report can be found here: <https://github.com/UBC-MDS-2026-27/DSCI-522-GROUP-6-Predicting_term_deposit_subscription>.
+The Python programming language (Van Rossum and Drake 2009) and the following Python packages were used to perform the analysis: requests (Reitz 2011), zipfile (Van Rossum and Drake 2009), pandas (McKinney 2010), Altair (VanderPlas et al. 2018) and scikit-learn (Pedregosa et al. 2011). The code used to perform the analysis and create this report can be found here: <https://github.com/UBC-MDS-2026-27/DSCI-522-GROUP-6-Predicting_term_deposit_subscription>.
 
 First, we examined the features based on their definitions and relevance to predicting term deposit subscriptions. The duration feature represents the duration of the last contact with a client, measured in seconds. Since this information is only available after a call has taken place, including it would introduce data leakage when predicting whether a client will subscribe before making the call. Therefore, we excluded duration from the analysis. 
 
@@ -492,9 +498,6 @@ full_preprocessor = make_pipeline(
     FunctionTransformer(transform_pdays, validate=False),
     preprocessor
 )
-
-X_train_processed = full_preprocessor.fit_transform(X_train)
-X_test_processed = full_preprocessor.transform(X_test)
 ```
 
 We used a Dummy Classifier as the baseline and compared it with two candidate models: Logistic Regression and K-Nearest Neighbours. All three models were evaluated with 5-fold cross-validation.
@@ -672,7 +675,6 @@ test_results.round(3)
 # Discussion
 
 # References
-Harris, Charles R., K. Jarrod Millman, Stéfan J. van der Walt, et al. 2020. “Array Programming with NumPy.” Nature 585: 357–362. https://doi.org/10.1038/s41586-020-2649-2.
 
 McKinney, Wes. 2010. “Data Structures for Statistical Computing in Python.” In Proceedings of the 9th Python in Science Conference, edited by Stéfan van der Walt and Jarrod Millman, 56–61. https://doi.org/10.25080/Majora-92bf1922-00a.
 
