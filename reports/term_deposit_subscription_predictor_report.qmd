@@ -27,12 +27,14 @@ from sklearn.dummy import DummyClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import cross_validate, StratifiedKFold
-from sklearn.metrics import make_scorer, precision_score, recall_score, f1_score
+from sklearn.metrics import make_scorer, precision_score, recall_score, f1_score, accuracy_score
 
 _ = alt.renderers.enable("png", scale_factor=2)
 ```
 
 # Summary
+
+In this project, we built a classification model to predict whether a bank client will subscribe to a term deposit, using only information available before the bank calls the client. We compared a Dummy Classifier, Logistic Regression and K-Nearest Neighbours using 5-fold cross-validation, and chose Logistic Regression as our final model. On the unseen test set, the final model had an accuracy of 0.889, a precision of 0.584 and a recall of 0.170. This means that when the model predicts a client will subscribe, it is correct about 58.4% of the time, which is much better than the overall subscription rate of about 11.7%, but it finds only about 17% of the clients who actually subscribe. The model could help the bank decide which clients to call first, but further work, such as handling the class imbalance, is needed to improve its recall before it is used in practice.
 
 # Introduction
 
@@ -464,6 +466,8 @@ Second, we divided the features into three main categories: numerical, categoric
 
 One feature requiring special attention was pdays, which represents the number of days since a client was last contacted during a previous campaign. A value of -1 indicates that the client had not been previously contacted, while non-negative values indicate the number of days since the previous contact. Since -1 has a different meaning from non-negative values, treating all values as ordinary numerical observations would be inappropriate. Additionally, most observations had a value of -1. Therefore, we transformed pdays into a new binary feature called previously_contacted, where -1 was encoded as 0 and all non-negative values were encoded as 1. This transformation distinguishes clients who had been previously contacted from those who had not, although it removes information about the exact number of days since the previous contact.
 
+We treated the month of the last contact as a categorical feature, because months have no natural order that matters for subscription, and the subscription rate differed a lot between months (Figure 4). We dropped the day of the month, because treating it as a numeric feature would mean that day 31 is "more" than day 1, and it was not clearly linked to subscription.
+
 ```{python}
 X_train = bank_train.drop(columns="y")
 y_train = bank_train["y"]
@@ -476,8 +480,8 @@ def transform_pdays(X):
     X["previously_contacted"] = (X["pdays"] != -1).astype(int)
     return X.drop(columns=["pdays"])
 
-numeric_features = ["age", "balance", "day", "campaign", "previous"]
-categorical_features = ["job", "marital", "education", "contact", "poutcome"]
+numeric_features = ["age", "balance", "campaign", "previous"]
+categorical_features = ["job", "marital", "education", "contact", "month", "poutcome"]
 binary_features = ["default", "housing", "loan"]
 contacted_features = ["previously_contacted"]
 ```
@@ -561,7 +565,7 @@ dummy_results = pd.DataFrame({
 display(dummy_results.round(3))
 ```
 
-As the Logistic Regression Model Result (Table ) shown below, we can see that Logistic Regression gets validation accuracy as 0.894, precision as 0.676, recall as 0.174, and F1 score as 0.277. We can see all of the data is higher than DummyClassifier model. This indicates that this model is a better choice compared with DummyClassifier model. Low reecall is one problem of Logistic Regression model. This means the model correctly identified only about 17.4% of customers who actually subscribed to a term deposit, missing approximately 82.6% of potential subscribers. It suggests that the model is relatively conservative when predicting the positive class. One possible reason is the class imbalance in the dataset, which may cause the model to favor the majority class. To improve recall, we could explore using class_weight="balanced" or adjusting the classification threshold, although these changes may reduce precision.
+As the Logistic Regression Model Result (Table ) shown below, we can see that Logistic Regression gets validation accuracy as 0.893, precision as 0.641, recall as 0.189, and F1 score as 0.292. We can see all of the data is higher than DummyClassifier model. This indicates that this model is a better choice compared with DummyClassifier model. Low reecall is one problem of Logistic Regression model. This means the model correctly identified only about 18.9% of customers who actually subscribed to a term deposit, missing approximately 81.1% of potential subscribers. It suggests that the model is relatively conservative when predicting the positive class. One possible reason is the class imbalance in the dataset, which may cause the model to favor the majority class. To improve recall, we could explore using class_weight="balanced" or adjusting the classification threshold, although these changes may reduce precision.
 
 Table. Logistic Regression Model Result
 ```{python}
@@ -598,7 +602,7 @@ reg_results = pd.DataFrame({
 display(reg_results.round(3))
 ```
 
-As the KNearestNeighbour (KNN) Model Result (Table .) shown below, we can see that KNN model gets accuracy as 0.884, precision as 0.506, recall as 0.192, F1 score as 0.278. All of the present data is also better than DummyClassifier model. This indicates that this model is better than DummyClassifier model.
+As the KNearestNeighbour (KNN) Model Result (Table .) shown below, we can see that KNN model gets accuracy as 0.886, precision as 0.536, recall as 0.211, F1 score as 0.303. All of the present data is also better than DummyClassifier model. This indicates that this model is better than DummyClassifier model.
 
 Table. KNearestNeighbour (KNN) Model Result
 ```{python}
@@ -636,7 +640,7 @@ display(knn_results.round(3))
 ```
 
 
-As the Conclusion of data from three models (Table .) shown below, in comparison of Logistic Regression and KNearestNeighbour, we can find that the gap of f1 score of train and validation of Logistic Regression, which is about 0.01, is much smaller than the one of K-Nearest Neighbour model, which is about 0.12. This indicates that KNN model is might a bit overfitting. However, improving recall remains an important direction for future model development.
+As the Conclusion of data from three models (Table .) shown below, in comparison of Logistic Regression and KNearestNeighbour, we can find that the gap of f1 score of train and validation of Logistic Regression, which is about 0.005, is much smaller than the one of K-Nearest Neighbour model, which is about 0.13. This indicates that KNN model is might a bit overfitting. However, improving recall remains an important direction for future model development.
 
 Table.  Conclusion of data from three models
 ```{python}
@@ -649,9 +653,33 @@ comparison_df = pd.concat([
 display(comparison_df.round(3))
 ```
 
-Therefore, we still want to choose the Logistic Regression as the best model to use, because it provides comparable validation F1 performance and higher precision.
+Therefore, we chose Logistic Regression as our final model. Although KNN had a slightly higher validation F1 score (0.303 compared with 0.292), Logistic Regression had a higher validation precision (0.641 compared with 0.536) and a much smaller gap between its training and validation F1 scores, which means it is less likely to be overfitting.
 
 # Results
+
+We fitted the final Logistic Regression model on the whole training set and evaluated it once on the test set (Table .). The model reached an accuracy of 0.889, which is only slightly higher than the accuracy of the Dummy Classifier (0.883), because most clients in the test set did not subscribe. Its precision was 0.584, which means that when the model predicted that a client would subscribe, it was correct about 58.4% of the time. However, its recall was only 0.170, so the model found only about 17% of the clients who actually subscribed. The test scores were slightly lower than the cross-validation scores, which suggests that the model's performance on new data is close to what we expected.
+
+**Table .** Performance of the final Logistic Regression model on the test set.
+
+```{python}
+# fit the final model on the whole training set
+reg_pipe.fit(X_train, y_train)
+
+# predict the test set once
+y_pred = reg_pipe.predict(X_test)
+
+test_results = pd.DataFrame({
+    "Metric": ["Accuracy", "Precision", "Recall", "F1"],
+    "Test": [
+        accuracy_score(y_test, y_pred),
+        precision_score(y_test, y_pred, pos_label="yes"),
+        recall_score(y_test, y_pred, pos_label="yes"),
+        f1_score(y_test, y_pred, pos_label="yes")
+    ]
+}).set_index("Metric")
+
+test_results.round(3)
+```
 
 # Discussion
 

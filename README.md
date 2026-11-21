@@ -10,7 +10,7 @@
 
 In this project, we asked whether we can predict if a bank client will subscribe to a term deposit, using information the bank has before calling the client. We used the Bank Marketing data set from the UCI Machine Learning Repository, which contains data from phone marketing campaigns of a Portuguese bank.
 
-<!-- TODO: add the main findings and what they mean once the final model is evaluated on the test set -->
+We compared a Dummy Classifier, Logistic Regression and K-Nearest Neighbours, and chose Logistic Regression as our final model. On the unseen test set, it had an accuracy of 0.889, a precision of 0.584 and a recall of 0.170: when it predicts that a client will subscribe, it is correct about 58.4% of the time (compared with an overall subscription rate of about 11.7%), but it finds only about 17% of the clients who actually subscribe, so further work is needed to improve its recall.
 
 ## How to run the analysis
 
