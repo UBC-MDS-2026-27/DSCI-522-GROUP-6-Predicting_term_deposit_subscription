@@ -43,7 +43,7 @@ This Code of Conduct applies in all project spaces, including the GitHub reposit
 If you experience or witness unacceptable behaviour, please report it to the project team:
 
 * Abdulrahman Aleid - aleid@student.ubc.ca
-* Muhaimin Choudhury - safwatmuhaimin@gmail.com
+* Ahmed Muhaimin Choudhury - safwatmuhaimin@gmail.com
 * David Wu - wuduzhi15@gmail.com
 
 If your report involves one of the people above, you may contact the other team members only. All reports will be reviewed and investigated promptly and fairly. Maintainers must respect the privacy and security of the person who reports an incident.

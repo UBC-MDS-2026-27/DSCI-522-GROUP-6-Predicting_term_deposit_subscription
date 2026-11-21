@@ -4,7 +4,7 @@
 
 Copyright (c) 2026 Abdulrahman Aleid, Ahmed Muhaimin Choudhury, David Wu
 
-This report (source contained in the `DSCI-522-GROUP-6-repository` [repository](https://github.com/UBC-MDS-2026-27/DSCI-522-GROUP-6-repository)) is made available under the Attribution-NonCommercial-ShareAlike 4.0 International ([CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)). It is adapted from the DSCI 522 project template in the UBC-MDS [`DSCI_522_project-template-breast-cancer-predictor`](https://github.com/UBC-MDS/DSCI_522_project-template-breast-cancer-predictor) repository (Copyright (c) 2026 Tiffany A. Timbers, Joel Ostblom, Melissa Lee, Daniel Chen, Kehan Sky Sheng, CC BY-NC-SA 4.0), which is itself adapted from Tiffany A. Timbers' [`breast_cancer_predictor_py`](https://github.com/ttimbers/breast_cancer_predictor_py) repository (Copyright (c) 2023 Tiffany A. Timbers, CC BY-NC-SA 4.0).
+This report (source contained in the `DSCI-522-GROUP-6-Predicting_term_deposit_subscription` [repository](https://github.com/UBC-MDS-2026-27/DSCI-522-GROUP-6-Predicting_term_deposit_subscription)) is made available under the Attribution-NonCommercial-ShareAlike 4.0 International ([CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)). It is adapted from the DSCI 522 project template in the UBC-MDS [`DSCI_522_project-template-breast-cancer-predictor`](https://github.com/UBC-MDS/DSCI_522_project-template-breast-cancer-predictor) repository (Copyright (c) 2026 Tiffany A. Timbers, Joel Ostblom, Melissa Lee, Daniel Chen, Kehan Sky Sheng, CC BY-NC-SA 4.0), which is itself adapted from Tiffany A. Timbers' [`breast_cancer_predictor_py`](https://github.com/ttimbers/breast_cancer_predictor_py) repository (Copyright (c) 2023 Tiffany A. Timbers, CC BY-NC-SA 4.0).
 
 This is a human-readable summary of (and not a substitute for) the [license](https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode).
 
@@ -17,7 +17,7 @@ The licensor cannot revoke these freedoms as long as you follow the license term
 
 Under the following terms:
 
-* Attribution — You must give appropriate credit (mentioning that your work is derived from work that is Copyright © Tiffany A. Timbers, Joel Ostblom, Melissa Lee, Daniel Chen, Kehan Sky Sheng and, where practical, linking to https://github.com/UBC-MDS/DSCI_522_project-template-breast-cancer-predictor), provide a link to the license, and indicate if changes were made. You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
+* Attribution — You must give appropriate credit (mentioning that your work is derived from work that is Copyright © Abdulrahman Aleid, Ahmed Muhaimin Choudhury, David Wu and, where practical, linking to https://github.com/UBC-MDS-2026-27/DSCI-522-GROUP-6-Predicting_term_deposit_subscription), provide a link to the license, and indicate if changes were made. You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
 * NonCommercial — You may not use the material for commercial purposes.
 * ShareAlike — If you remix, transform, or build upon the material, you must distribute your contributions under the same license as the original.
 
