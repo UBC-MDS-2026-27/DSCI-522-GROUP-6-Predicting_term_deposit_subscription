@@ -154,7 +154,7 @@ pd.DataFrame({
 Almost all clients with an unknown previous campaign outcome (29,563 of 29,567, or 99.99%) were not contacted in a previous campaign (Table 3). For this variable, "unknown" therefore does not represent missing information: it means that there was no previous campaign for that client. For the other three variables, the "unknown" values are true missing information, but we kept them as well. Removing these rows would discard a large part of the data, because almost a third of the clients in the training set have an unknown contact type (Table 2). We therefore kept "unknown" as its own category in all four variables, so that the model can learn from it like any other category.
 
 ## Analysis
-The Python programming language (Van Rossum and Drake 2009) and the following Python packages were used to perform the analysis: requests (Reitz 2011), zipfile (Van Rossum and Drake 2009), NumPy (Harris et al. 2020), pandas (McKinney 2010), Altair (VanderPlas et al. 2018) and scikit-learn (Pedregosa et al. 2011). The code used to perform the analysis and create this report can be found here: https://github.ubc.ca/mds-2026-27/DSCI_561_lab1_wdz26.git
+The Python programming language (Van Rossum and Drake 2009) and the following Python packages were used to perform the analysis: requests (Reitz 2011), zipfile (Van Rossum and Drake 2009), NumPy (Harris et al. 2020), pandas (McKinney 2010), Altair (VanderPlas et al. 2018) and scikit-learn (Pedregosa et al. 2011). 
 
 Firstly, we are going to analyze the features manually with the meaning. The meaning of duration is last contact duration, in seconds (numeric). And the meaning of month is last contact month of year. Therefore, we don't think these two features would have reasonable relationship with the term deposit description. 
 
@@ -613,4 +613,16 @@ num_chart
 
 
 # References
+Harris, Charles R., K. Jarrod Millman, Stéfan J. van der Walt, et al. 2020. “Array Programming with NumPy.” Nature 585: 357–362. https://doi.org/10.1038/s41586-020-2649-2.
+
+McKinney, Wes. 2010. “Data Structures for Statistical Computing in Python.” In Proceedings of the 9th Python in Science Conference, edited by Stéfan van der Walt and Jarrod Millman, 56–61. https://doi.org/10.25080/Majora-92bf1922-00a.
+
 Moro, S., P. Rita, and P. Cortez. 2014. “Bank Marketing.” Dataset. UCI Machine Learning Repository. https://doi.org/10.24432/C5K306.
+
+Pedregosa, Fabian, Gaël Varoquaux, Alexandre Gramfort, et al. 2011. “Scikit-learn: Machine Learning in Python.” Journal of Machine Learning Research 12: 2825–2830.
+
+Reitz, Kenneth. 2011. “Requests: HTTP for Humans.” https://requests.readthedocs.io/.
+
+Van Rossum, Guido, and Fred L. Drake. 2009. Python 3 Reference Manual. Scotts Valley, CA: CreateSpace.
+
+VanderPlas, Jacob, Brian E. Granger, Jeffrey Heer, et al. 2018. “Altair: Interactive Statistical Visualizations for Python.” Journal of Open Source Software 3 (32): 1057. https://doi.org/10.21105/joss.01057
