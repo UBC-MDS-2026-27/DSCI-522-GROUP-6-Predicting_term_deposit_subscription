@@ -62,7 +62,6 @@ Before making a substantial change, open a GitHub issue describing the proposed 
 New Python code should follow the [PEP 8 style guide](https://peps.python.org/pep-0008/).
 
 ## AI Policy
-
 Contributors may use generative AI tools to assist with tasks such as brainstorming, explaining code, debugging, improving writing, and suggesting tests, subject to the following requirements:
 
 - You must understand, review, and verify all AI-assisted code, text, and other contributions before submitting them. Do not submit AI-generated work that you cannot explain or validate.
@@ -70,8 +69,10 @@ Contributors may use generative AI tools to assist with tasks such as brainstorm
 - Contributors must make the final decisions about their changes. GitHub issues and PRs must be opened and managed by a human contributor, not autonomously by an AI agent or chatbot.
 - Before using an AI tool for project work, read CLAUDE.md and provide its relevant guidance to the tool when appropriate.
 - Do not share secrets, credentials, or private information with AI tools. Check AI-assisted content for correctness, appropriate attribution, and compliance with project requirements.
-- Pull requests and GitHub issues are opened by team members, never by an AI agent or chat bot.
+- Pull requests and GitHub issues are opened by human contributors, never by an AI agent or chat bot.
 
 ## Attribution
 
 This contributing guide adapts elements of the [dplyr contributing guide](https://github.com/tidyverse/dplyr/blob/main/.github/CONTRIBUTING.md) and the [tidyverse guide to reproducible examples](https://tidyverse.org/help/#reprex). It has been modified to reflect this project's workflow and AI policy.
+
+
