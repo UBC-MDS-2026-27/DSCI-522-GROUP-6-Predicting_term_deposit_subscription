@@ -12,17 +12,17 @@ In this project, we asked whether we can predict if a bank client will subscribe
 
 We compared a Dummy Classifier, Logistic Regression and K-Nearest Neighbours, and chose Logistic Regression as our final model. On the unseen test set, it had an accuracy of 0.889, a precision of 0.584 and a recall of 0.170: when it predicts that a client will subscribe, it is correct about 58.4% of the time (compared with an overall subscription rate of about 11.7%), but it finds only about 17% of the clients who actually subscribe, so further work is needed to improve its recall.
 
+## Report
+The final report can be found [here](https://ubc-mds-2026-27.github.io/DSCI-522-GROUP-6-Predicting_term_deposit_subscription/), or as a [PDF](https://github.com/ubc-mds-2026-27/DSCI-522-GROUP-6-Predicting_term_deposit_subscription/blob/main/reports/term_deposit_subscription_predictor_report.pdf).
+
 ## How to run the analysis
+To make our results easy to reproduce, all of the software for this project is packaged in a Docker image called [muhighmin/dsci-522-group-6-predicting_term_deposit_subscription](https://hub.docker.com/r/muhighmin/dsci-522-group-6-predicting_term_deposit_subscription). This means the only tools you need on your own computer are Git and Docker Desktop.
 
 ### 1. Install the required software
+Download and install [Git](https://git-scm.com/) and [Docker Desktop](https://docs.docker.com/get-docker/) for your operating system. If you are using Windows, make sure to use Git Bash. Docker Desktop must be running before you run the commands in steps 4 and 5, or they will fail with a connection error.
 
-- [Git](https://git-scm.com/)
-- [uv](https://docs.astral.sh/uv/getting-started/installation/)
-- [Quarto](https://quarto.org/docs/get-started/)
-
-You also need an internet connection, because the analysis downloads the data from the UCI Machine Learning Repository.
-
-### 2. Clone the repository
+### 2. Get a copy of the project
+Open a terminal and run:
 
 ```bash
 git clone https://github.com/UBC-MDS-2026-27/DSCI-522-GROUP-6-Predicting_term_deposit_subscription.git
@@ -30,35 +30,44 @@ git clone https://github.com/UBC-MDS-2026-27/DSCI-522-GROUP-6-Predicting_term_de
 cd DSCI-522-GROUP-6-Predicting_term_deposit_subscription
 ```
 
-### 3. Set up the environment
+Every command after this point should be run inside this directory.
+
+### 3. Create an ssh key (first time only)
+When the container starts, it reads your public ssh key so that tools like Positron can log in to it over ssh without a password.
+
+To see if you already have a key, run `ls ~/.ssh/id_ed25519.pub`.
+If you get a "No such file" message, create one with the command below and accept the defaults by pressing Enter at each question:
 
 ```bash
-uv sync
+ssh-keygen -t ed25519
 ```
 
-This creates a virtual environment with the exact package versions listed in `uv.lock`.
+If this key is missing when the container starts, Docker makes an empty folder at `~/.ssh/id_ed25519.pub` in its place. To fix this, delete that folder, run `ssh-keygen -t ed25519`, and start the container again.
 
-### 4. Install TinyTeX (needed for the PDF version of the report)
+### 4. Pull the Docker image
+The command below downloads our project's image from Docker Hub. It may take a few minutes the first time.
 
 ```bash
-quarto install tinytex
+docker compose pull
 ```
 
-Skip this step if you already have a LaTeX installation.
-
-### 5. Render the report
+### 5. Reproduce the analysis
+To run the full analysis and build the report inside the container, use:
 
 ```bash
-uv run quarto render reports/term_deposit_subscription_predictor_report.qmd
+docker compose run --rm analysis-env uv run quarto render reports/term_deposit_subscription_predictor_report.qmd
 ```
 
-This downloads the data, runs the analysis, and creates the report in `reports/` as both HTML and PDF.
+This command repeats every step of the analysis. The data is downloaded fresh from the UCI Machine Learning Repository, so make sure you are connected to the internet. Running it replaces the files in `data/raw` and `data/processed` and the report files `reports/term_deposit_subscription_predictor_report.html` and `reports/term_deposit_subscription_predictor_report.pdf`. The `--rm` option deletes the container as soon as the render is finished, so you do not have to shut it down yourself.
+
+## Contributing
+To set up a development environment, add a new package or update the published report, follow the steps in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Dependencies
 
-- [uv](https://docs.astral.sh/uv/) (manages the Python environment)
-- [Quarto](https://quarto.org/) (renders the report)
-- Python packages and their exact versions are listed in [`pyproject.toml`](pyproject.toml) and locked in [`uv.lock`](uv.lock)
+- [Docker](https://docs.docker.com/get-docker/)
+
+Our image is built from the `Dockerfile` in this repository and includes Quarto, uv and Python. The Python packages we use are listed in `pyproject.toml`, and their exact versions are pinned in `uv.lock`.
 
 ## Licenses
 
@@ -75,7 +84,3 @@ Example prompts we used:
 - "Check our CODE_OF_CONDUCT.md for spelling and grammar mistakes."
 - "Are uv add vl-convert-python and quarto install tinytex both part of the environment setup?"
 - "Why did our EDA disappear after the PR was merged?"
-
-## Report
-
-The final report can be found [here](https://ubc-mds-2026-27.github.io/DSCI-522-GROUP-6-Predicting_term_deposit_subscription/reports/term_deposit_subscription_predictor_report.html) (HTML), or as a [PDF](https://github.com/UBC-MDS-2026-27/DSCI-522-GROUP-6-Predicting_term_deposit_subscription/blob/main/reports/term_deposit_subscription_predictor_report.pdf).
