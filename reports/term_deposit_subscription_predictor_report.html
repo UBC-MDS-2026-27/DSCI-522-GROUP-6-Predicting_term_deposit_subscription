@@ -2252,7 +2252,7 @@ var requirejs,require,define;(function(global,setTimeout){var req,s,head,baseEle
   </ul></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
-<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="term_deposit_subscription_predictor_report.pdf"><i class="bi bi-file-pdf"></i>Typst</a></li></ul></div></nav>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="https://github.com/ubc-mds-2026-27/DSCI-522-GROUP-6-Predicting_term_deposit_subscription/blob/main/reports/term_deposit_subscription_predictor_report.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
 </div>
 <main class="content" id="quarto-document-content" tabindex="-1">
 
@@ -2287,7 +2287,7 @@ var requirejs,require,define;(function(global,setTimeout){var req,s,head,baseEle
 </header>
 
 
-<div id="f340d15c" class="cell" data-execution_count="1">
+<div id="1e961a6a" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> zipfile</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
@@ -2318,7 +2318,7 @@ var requirejs,require,define;(function(global,setTimeout){var req,s,head,baseEle
 <h1>Methods</h1>
 <section id="data" class="level2">
 <h2 class="anchored" data-anchor-id="data">Data</h2>
-<div id="26165317" class="cell" data-execution_count="2">
+<div id="bf4204ca" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># create the data folders if they don&#39;t exist</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>os.makedirs(<span class="st">&quot;../data/raw&quot;</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>os.makedirs(<span class="st">&quot;../data/processed&quot;</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
@@ -2338,13 +2338,13 @@ var requirejs,require,define;(function(global,setTimeout){var req,s,head,baseEle
 <span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> zipfile.ZipFile(<span class="st">&quot;../data/raw/bank.zip&quot;</span>) <span class="im">as</span> z:</span>
 <span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    z.extractall(<span class="st">&quot;../data/raw&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="07fe0acd" class="cell" data-execution_count="3">
+<div id="64a44b04" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># read in the full data set</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>bank <span class="op">=</span> pd.read_csv(<span class="st">&quot;../data/raw/bank-full.csv&quot;</span>, sep<span class="op">=</span><span class="st">&quot;;&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Before cleaning the data, we checked that the download was complete and that the file has no empty cells or duplicate rows (Table 1). These checks only confirm that the file was read correctly, so they do not use any information that could influence our modelling decisions.</p>
 <p><strong>Table 1.</strong> Basic checks of the full data set.</p>
-<div id="f0e3335b" class="cell" data-execution_count="4">
+<div id="d3521088" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>pd.DataFrame({</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Check&quot;</span>: [<span class="st">&quot;Number of rows&quot;</span>, <span class="st">&quot;Number of columns&quot;</span>, <span class="st">&quot;Empty cells&quot;</span>, <span class="st">&quot;Duplicate rows&quot;</span>],</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Result&quot;</span>: [</span>
@@ -2393,14 +2393,14 @@ var requirejs,require,define;(function(global,setTimeout){var req,s,head,baseEle
 </div>
 </div>
 <p>We removed the call duration variable before modelling. The duration of a call is only known after the call has ended, and by then the outcome (whether the client subscribed) is also known. A model that uses call duration therefore cannot help the bank decide which clients to call, which is the purpose of our analysis. This decision is based on the meaning of the variable, not on the data, so it is safe to make before splitting the data.</p>
-<div id="cb4fdd95" class="cell" data-execution_count="5">
+<div id="0acce44e" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># drop duration: it is only known after the call ends,</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># so it cannot be used to predict before calling a client</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>bank_clean <span class="op">=</span> bank.drop(columns<span class="op">=</span>[<span class="st">&quot;duration&quot;</span>])</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>bank_clean.to_csv(<span class="st">&quot;../data/processed/bank_clean.csv&quot;</span>, index<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>We then split the data into a training set (80%) and a test set (20%). We split the data before any further exploration, so that the test set does not influence any decision we make. Because only a small share of clients subscribed to a term deposit, we used a stratified split, which keeps the same proportion of subscribers in both sets.</p>
-<div id="19bdfa1d" class="cell" data-execution_count="6">
+<div id="18e82235" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># split the data into training (80%) and test (20%) sets</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>bank_train, bank_test <span class="op">=</span> train_test_split(</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    bank_clean,</span>
@@ -2417,7 +2417,7 @@ var requirejs,require,define;(function(global,setTimeout){var req,s,head,baseEle
 <h2 class="anchored" data-anchor-id="data-quality-in-the-training-set">Data quality in the training set</h2>
 <p>Although the data set has no empty cells, some categorical variables record missing information as the value “unknown” (Table 2). This affects four variables in the training set: job, education, contact type and the outcome of the previous campaign.</p>
 <p><strong>Table 2.</strong> Number and percentage of “unknown” values in the training set, for the variables that contain them.</p>
-<div id="c9bd4c81" class="cell" data-execution_count="7">
+<div id="59d384d1" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># count &quot;unknown&quot; values in each column of the training set</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>unknown_counts <span class="op">=</span> (bank_train <span class="op">==</span> <span class="st">&quot;unknown&quot;</span>).<span class="bu">sum</span>()</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>unknown_counts <span class="op">=</span> unknown_counts[unknown_counts <span class="op">&gt;</span> <span class="dv">0</span>]</span>
@@ -2479,7 +2479,7 @@ var requirejs,require,define;(function(global,setTimeout){var req,s,head,baseEle
 </div>
 <p>To understand the “unknown” values in the previous campaign outcome, we compared this variable with the number of days since the client was last contacted in a previous campaign. The data set uses -1 for clients who were not previously contacted (Table 3).</p>
 <p><strong>Table 3.</strong> Number of clients in the training set with an unknown previous campaign outcome, and how many of them were not previously contacted.</p>
-<div id="539e670d" class="cell" data-execution_count="8">
+<div id="439abf77" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># keep only the clients whose previous campaign outcome is &quot;unknown&quot;</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>unknown_poutcome <span class="op">=</span> bank_train[bank_train[<span class="st">&quot;poutcome&quot;</span>] <span class="op">==</span> <span class="st">&quot;unknown&quot;</span>]</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2526,7 +2526,7 @@ var requirejs,require,define;(function(global,setTimeout){var req,s,head,baseEle
 <h3 class="anchored" data-anchor-id="target-class-composition">Target class composition</h3>
 <p>To choose suitable evaluation metrics, we first checked whether the target classes are balanced (Table 4 and Figure 1). The classes are highly imbalanced: 88.3% of the clients in the training set did not subscribe. Accuracy alone would therefore be misleading, so we also used precision, recall and F1 score.</p>
 <p><strong>Table 4.</strong> Target class composition in the training data</p>
-<div id="80315e1d" class="cell" data-execution_count="9">
+<div id="f88a6e02" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>target_counts <span class="op">=</span> (</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    bank_train[<span class="st">&quot;y&quot;</span>]</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    .value_counts()</span>
@@ -2580,7 +2580,7 @@ var requirejs,require,define;(function(global,setTimeout){var req,s,head,baseEle
 </div>
 </div>
 </div>
-<div id="730ab21d" class="cell" data-execution_count="10">
+<div id="b5dafc4a" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>target_chart <span class="op">=</span> (</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    alt.Chart(target_counts)</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    .mark_bar()</span>
@@ -2608,7 +2608,7 @@ var requirejs,require,define;(function(global,setTimeout){var req,s,head,baseEle
 <h3 class="anchored" data-anchor-id="descriptive-summary-of-individual-features">Descriptive summary of individual features</h3>
 <p>We first looked at summary statistics of the numeric features (Table 5). The numeric features are heavily right-skewed, and their scales vary widely: age ranges from 18 to 95 and campaign contacts from 1 to 63, while balance ranges from -8,019 to 102,127 euros and previous contacts from 0 to 275. We therefore included a scaler for the numeric features in our pipeline. The number of days since the previous contact ranges from -1 to 871, but its only useful signal is whether the client was contacted before, so we converted it into a binary feature for the charts and the model.</p>
 <p><strong>Table 5.</strong> Summary of numeric features</p>
-<div id="5c0cbe4d" class="cell" data-execution_count="11">
+<div id="e8f18824" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>summary_cols <span class="op">=</span> [<span class="st">&quot;age&quot;</span>, <span class="st">&quot;balance&quot;</span>, <span class="st">&quot;campaign&quot;</span>, <span class="st">&quot;pdays&quot;</span>, <span class="st">&quot;previous&quot;</span>]</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>num_summary <span class="op">=</span> (</span>
@@ -2694,7 +2694,7 @@ var requirejs,require,define;(function(global,setTimeout){var req,s,head,baseEle
 </div>
 <p>Table 6 summarizes the categorical features: the number of levels, the most common level and its share, and whether the feature contains “unknown” values.</p>
 <p><strong>Table 6.</strong> Summary of categorical features</p>
-<div id="94eae34e" class="cell" data-execution_count="12">
+<div id="21eadf0e" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>cat_cols <span class="op">=</span> [<span class="st">&quot;job&quot;</span>, <span class="st">&quot;marital&quot;</span>, <span class="st">&quot;education&quot;</span>, <span class="st">&quot;default&quot;</span>, <span class="st">&quot;housing&quot;</span>,</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;loan&quot;</span>, <span class="st">&quot;contact&quot;</span>, <span class="st">&quot;month&quot;</span>, <span class="st">&quot;poutcome&quot;</span>]</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2813,7 +2813,7 @@ var requirejs,require,define;(function(global,setTimeout){var req,s,head,baseEle
 <section id="binary-features" class="level3">
 <h3 class="anchored" data-anchor-id="binary-features">Binary features</h3>
 <p>To see whether the binary and categorical features are useful for predicting subscription, we calculated the subscription rate for each level of each feature and compared these rates in bar charts. We split them into three charts: one for binary features, one for categorical features with 3 or 4 levels, and one for categorical features with more than 4 levels. Figure 2 shows that previous contact has the strongest signal among the binary features: clients who were contacted before had a subscription rate about 15 percentage points higher than clients contacted for the first time. Having a housing loan also shows a clear difference: clients without a housing loan had a subscription rate about 10 percentage points higher than clients with one.</p>
-<div id="bde28e2e" class="cell" data-execution_count="13">
+<div id="97fef9fc" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> subscription_rate(df, col):</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span>(</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>        df.assign(subscribed<span class="op">=</span>(df[<span class="st">&quot;y&quot;</span>]<span class="op">==</span><span class="st">&quot;yes&quot;</span>))</span>
@@ -2868,7 +2868,7 @@ var requirejs,require,define;(function(global,setTimeout){var req,s,head,baseEle
 <section id="categorical-features" class="level3">
 <h3 class="anchored" data-anchor-id="categorical-features">Categorical features</h3>
 <p>Next, we looked at the categorical features with 3 or 4 levels (Figure 3). For marital status, contact type and education, the subscription rate does not vary much across levels. For the previous campaign outcome, however, clients whose previous campaign was a success have a much higher subscription rate than clients with other outcomes. Among the categorical features with more than 4 levels (Figure 4), the last contact month shows higher subscription rates in March, September, October and December. For job, students, who usually do not have fixed income, have the highest subscription rate. However, the differences between jobs are smaller than for the previous campaign outcome, so job is likely a weaker signal.</p>
-<div id="6a259c60" class="cell" data-execution_count="14">
+<div id="0f77f294" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>cat_cols34 <span class="op">=</span> [<span class="st">&quot;contact&quot;</span>, <span class="st">&quot;education&quot;</span>, <span class="st">&quot;marital&quot;</span>, <span class="st">&quot;poutcome&quot;</span>]</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>cat_perc34 <span class="op">=</span> []</span>
@@ -2903,7 +2903,7 @@ var requirejs,require,define;(function(global,setTimeout){var req,s,head,baseEle
 </div>
 </div>
 <p><strong>Figure 3.</strong> Comparison of term deposit subscription rate between categorical features training data with 3/4 levels</p>
-<div id="eb5dc5f6" class="cell" data-execution_count="15">
+<div id="e9bb6254" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>cat_cols_more <span class="op">=</span> [<span class="st">&quot;month&quot;</span>, <span class="st">&quot;job&quot;</span>]</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>cat_perc_more <span class="op">=</span> []</span>
@@ -2938,7 +2938,7 @@ var requirejs,require,define;(function(global,setTimeout){var req,s,head,baseEle
 </div>
 <p><strong>Figure 4.</strong> Comparison of term deposit subscription rate between categorical features of training data with more than 4 levels</p>
 <p>Figure 5 compares the subscription rate for each previous campaign outcome with the baseline subscription rate (dashed line). Clients whose previous campaign was a success had a much higher subscription rate than the baseline and than all other outcomes (49 percentage points higher than the next highest outcome). This suggests that the previous campaign outcome is a strong predictor of subscription.</p>
-<div id="190c1566" class="cell" data-execution_count="16">
+<div id="26263af8" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>baseline <span class="op">=</span> (bank_train[<span class="st">&quot;y&quot;</span>] <span class="op">==</span> <span class="st">&quot;yes&quot;</span>).mean()</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>poutcome_rate <span class="op">=</span> subscription_rate(bank_train, <span class="st">&quot;poutcome&quot;</span>)</span>
@@ -2979,7 +2979,7 @@ var requirejs,require,define;(function(global,setTimeout){var req,s,head,baseEle
 <section id="numeric-features" class="level3">
 <h3 class="anchored" data-anchor-id="numeric-features">Numeric features</h3>
 <p>In the descriptive summary (Table 5), the means of balance and campaign contacts are much higher than their medians, which shows that these features are right-skewed. We therefore plotted the numeric features as boxplots, to see whether their medians and interquartile ranges (IQRs) differ between clients who subscribed and clients who did not (Figure 6). The medians of all four numeric features are nearly the same for both groups, and their IQRs overlap a lot, which suggests that the numeric features are weaker signals than the categorical features. Two features are worth mentioning: subscribers tend to have higher balances, and negative balances are rare among them. Some clients who did not subscribe were contacted many times during this campaign (outliers not shown in Figure 6), which suggests that calling a client more often does not necessarily lead to subscription.</p>
-<div id="316c7f46" class="cell" data-execution_count="17">
+<div id="18eaf54a" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>num_cols <span class="op">=</span> [<span class="st">&quot;age&quot;</span>, <span class="st">&quot;balance&quot;</span>, <span class="st">&quot;campaign&quot;</span>, <span class="st">&quot;previous&quot;</span>]</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>num_df <span class="op">=</span> bank_train.melt(</span>
@@ -3028,7 +3028,7 @@ var requirejs,require,define;(function(global,setTimeout){var req,s,head,baseEle
 <p>Second, we divided the features into three main categories: numerical, categorical, and binary. Binary features can be represented in different formats, such as 0 and 1 or “yes” and “no”. These features were identified and processed according to their data types and meanings.</p>
 <p>One feature requiring special attention was <code>pdays</code>, which represents the number of days since a client was last contacted during a previous campaign. A value of -1 indicates that the client had not been previously contacted, while non-negative values indicate the number of days since the previous contact. Since -1 has a different meaning from non-negative values, treating all values as ordinary numerical observations would be inappropriate. Additionally, most observations had a value of -1. Therefore, we transformed <code>pdays</code> into a new binary feature called <code>previously_contacted</code>, where -1 was encoded as 0 and all non-negative values were encoded as 1. This transformation distinguishes clients who had been previously contacted from those who had not, although it removes information about the exact number of days since the previous contact.</p>
 <p>We treated the month of the last contact as a categorical feature, because months have no natural order that matters for subscription, and the subscription rate differed a lot between months (Figure 4). We dropped the day of the month, because treating it as a numeric feature would mean that day 31 is “more” than day 1, and it was not clearly linked to subscription.</p>
-<div id="d7a656ca" class="cell" data-execution_count="18">
+<div id="359e2788" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>X_train <span class="op">=</span> bank_train.drop(columns<span class="op">=</span><span class="st">&quot;y&quot;</span>)</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>y_train <span class="op">=</span> bank_train[<span class="st">&quot;y&quot;</span>]</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -3045,7 +3045,7 @@ var requirejs,require,define;(function(global,setTimeout){var req,s,head,baseEle
 <span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>binary_features <span class="op">=</span> [<span class="st">&quot;default&quot;</span>, <span class="st">&quot;housing&quot;</span>, <span class="st">&quot;loan&quot;</span>]</span>
 <span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>contacted_features <span class="op">=</span> [<span class="st">&quot;previously_contacted&quot;</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="bf455e02" class="cell" data-execution_count="19">
+<div id="8f27e693" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>numeric_pipe <span class="op">=</span> make_pipeline(StandardScaler())</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>categorical_pipe <span class="op">=</span> make_pipeline(OneHotEncoder(handle_unknown<span class="op">=</span><span class="st">&quot;ignore&quot;</span>))</span>
@@ -3071,7 +3071,7 @@ var requirejs,require,define;(function(global,setTimeout){var req,s,head,baseEle
 <p>We used a Dummy Classifier as the baseline and compared it with two candidate models: Logistic Regression and K-Nearest Neighbours. All three models were evaluated with 5-fold cross-validation.</p>
 <p>As Table 7 shows, the Dummy Classifier achieved a validation accuracy of 0.883, but its F1 score was 0, which means that it did not identify any clients who subscribed to a term deposit. This is because it always predicts the most common class (“no”), and 88.3% of the clients in the training set did not subscribe.</p>
 <p><strong>Table 7.</strong> Cross-validation results of the Dummy Classifier.</p>
-<div id="055f9328" class="cell" data-execution_count="20">
+<div id="56de2c23" class="cell" data-execution_count="20">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>dummy_pipe <span class="op">=</span> make_pipeline(</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    full_preprocessor,</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    DummyClassifier(strategy<span class="op">=</span><span class="st">&quot;most_frequent&quot;</span>)</span>
@@ -3162,7 +3162,7 @@ var requirejs,require,define;(function(global,setTimeout){var req,s,head,baseEle
 </div>
 <p>As Table 8 shows, Logistic Regression had a validation accuracy of 0.893, a precision of 0.641, a recall of 0.189 and an F1 score of 0.292. All of these scores are higher than those of the Dummy Classifier, so this model is a better choice than the baseline. Low recall is one problem of the Logistic Regression model: it correctly identified only about 18.9% of the clients who actually subscribed to a term deposit, and missed approximately 81.1% of them. This suggests that the model is relatively conservative when predicting the positive class. One possible reason is the class imbalance in the data set, which may cause the model to favour the majority class. To improve recall, we could use <code>class_weight=&quot;balanced&quot;</code> or adjust the classification threshold, although these changes may reduce precision.</p>
 <p><strong>Table 8.</strong> Cross-validation results of Logistic Regression.</p>
-<div id="b52cc1fa" class="cell" data-execution_count="21">
+<div id="14ee5dba" class="cell" data-execution_count="21">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>reg_pipe <span class="op">=</span> make_pipeline(</span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    full_preprocessor,</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    LogisticRegression(max_iter<span class="op">=</span><span class="dv">2000</span>, random_state<span class="op">=</span><span class="dv">123</span>)</span>
@@ -3240,7 +3240,7 @@ var requirejs,require,define;(function(global,setTimeout){var req,s,head,baseEle
 </div>
 <p>As Table 9 shows, the KNN model had a validation accuracy of 0.886, a precision of 0.536, a recall of 0.211 and an F1 score of 0.303. All of these scores are higher than those of the Dummy Classifier.</p>
 <p><strong>Table 9.</strong> Cross-validation results of K-Nearest Neighbours.</p>
-<div id="4564b3b3" class="cell" data-execution_count="22">
+<div id="5550d71f" class="cell" data-execution_count="22">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>knn_pipe <span class="op">=</span> make_pipeline(</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    full_preprocessor,</span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    KNeighborsClassifier(n_neighbors<span class="op">=</span><span class="dv">5</span>)</span>
@@ -3318,7 +3318,7 @@ var requirejs,require,define;(function(global,setTimeout){var req,s,head,baseEle
 </div>
 <p>As Table 10 shows, the gap between the training and validation F1 scores of Logistic Regression (about 0.005) is much smaller than that of K-Nearest Neighbours (about 0.13). This suggests that the KNN model may be overfitting. However, improving recall remains an important direction for future model development.</p>
 <p><strong>Table 10.</strong> Validation scores of the three models.</p>
-<div id="9955d2d3" class="cell" data-execution_count="23">
+<div id="f7f3d67e" class="cell" data-execution_count="23">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>comparison_df <span class="op">=</span> pd.concat([</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    dummy_results.assign(Model<span class="op">=</span><span class="st">&quot;Dummy&quot;</span>),</span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    reg_results.assign(Model<span class="op">=</span><span class="st">&quot;Logistic Regression&quot;</span>),</span>
@@ -3382,7 +3382,7 @@ var requirejs,require,define;(function(global,setTimeout){var req,s,head,baseEle
 <h1>Results</h1>
 <p>We fitted the final Logistic Regression model on the whole training set and evaluated it once on the test set (Table 11). The model reached an accuracy of 0.889, which is only slightly higher than the accuracy of the Dummy Classifier (0.883), because most clients in the test set did not subscribe. Its precision was 0.584, which means that when the model predicted that a client would subscribe, it was correct about 58.4% of the time. However, its recall was only 0.170, so the model found only about 17% of the clients who actually subscribed. The test scores were slightly lower than the cross-validation scores, which suggests that the model’s performance on new data is close to what we expected.</p>
 <p><strong>Table 11.</strong> Performance of the final Logistic Regression model on the test set.</p>
-<div id="367b7e49" class="cell" data-execution_count="24">
+<div id="9e37c4c9" class="cell" data-execution_count="24">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># fit the final model on the whole training set</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>reg_pipe.fit(X_train, y_train)</span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
