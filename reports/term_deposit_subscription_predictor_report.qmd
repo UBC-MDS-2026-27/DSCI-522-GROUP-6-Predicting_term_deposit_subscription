@@ -8,6 +8,11 @@ format:
     embed-resources: true
     toc: true
     code-overflow: wrap
+    format-links:
+      - html
+      - text: PDF
+        href: https://github.com/ubc-mds-2026-27/DSCI-522-GROUP-6-Predicting_term_deposit_subscription/blob/main/reports/term_deposit_subscription_predictor_report.pdf
+        icon: file-pdf
   typst:
     toc: true
     papersize: us-letter
