@@ -1,7 +1,8 @@
 .venv/
 .Rhistory
 .RData
-/.quarto/
+.quarto/
+*_files/
 **/*.quarto_ipynb
 **.ipynb_checkpoints
 **__pycache__
