@@ -8,15 +8,12 @@ format:
     embed-resources: true
     toc: true
     code-overflow: wrap
-  pdf:
+  typst:
     toc: true
-    code-overflow: wrap
-    geometry:
-        - margin=0.75in
-    include-in-header:
-        text: |
-            \usepackage{fvextra}
-            \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+    papersize: us-letter
+    margin:
+      x: 0.75in
+      y: 0.75in
 ---
 
 ```{python}
